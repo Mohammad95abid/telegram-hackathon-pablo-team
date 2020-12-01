@@ -23,14 +23,23 @@ def create_user(user_id, user_first_name, user_last_name):
 Checks if book exists, and if it doesnt, it inserts it into the Books table
 '''
 def add_book(book_title, book_description, book_purchase_link, book_audio_link, book_genre):
-    if not utils.is_valid(book_title, book_description, book_purchase_link, book_audio_link, book_genre):
+    if not utils.is_valid(book_title, book_description, book_genre):
         raise DBException("Invalid book details.")
     try:
         with connection.cursor() as cursor:
             cols = '(title, description_, link_to_buy, audio_book, genre)'
             vals = "values ('{}', '{}', '{}', '{}', '{}')".format(book_title, book_description,
-                                                      book_purchase_link, book_audio_link, book_genre)
+                                                                  book_purchase_link, book_audio_link, book_genre)
+            if book_purchase_link is  None and book_audio_link is  None:
+                vals = "values ('{}', '{}', NULL, NULL, '{}');".format(book_title, book_description, book_genre)
+            elif book_purchase_link is  None:
+                vals = "values ('{}', '{}', NULL, '{}', '{}');".format(book_title, book_description,
+                                                       book_audio_link, book_genre)
+            elif book_audio_link is  None:
+                vals = "values ('{}', '{}', '{}', NULL, '{}');".format(book_title, book_description,
+                                                                       book_purchase_link, book_genre)
             query = 'INSERT into books {} {}'.format(cols, vals)
+            print(query)
             cursor.execute(query)
             connection.commit()
             return True
@@ -193,8 +202,39 @@ def get_all_users_id():
 
 
 def show_table(table_name):
+    if not utils.is_valid(table_name):
+        raise DBException("Invalid table name details.")
     with connection.cursor() as cursor:
         query = "SELECT * FROM {}".format(table_name)
         cursor.execute(query)
         result = cursor.fetchall()
         print(result)
+
+def is_book_exist(book_title):
+    if not utils.is_valid(book_title):
+        raise DBException("Invalid book title details.")
+    with connection.cursor() as cursor:
+        condition = "title like '{}' ".format( book_title )
+        query = "SELECT * FROM books WHERE {}".format(condition)
+        cursor.execute(query)
+        return len(cursor.fetchall()) > 0
+
+def get_book(book_title):
+    if not utils.is_valid(book_title):
+        raise DBException("Invalid book title details.")
+    with connection.cursor() as cursor:
+        condition = "title like '{}' ".format( book_title )
+        query = "SELECT * FROM books WHERE {}".format(condition)
+        cursor.execute(query)
+        return cursor.fetchone()
+
+def is_user_like_a_book(book_title, user_id):
+    if not utils.is_valid(user_id):
+        raise DBException("Invalid user details.")
+    with connection.cursor() as cursor:
+        condition = "user_id like '{}' and book_title like '{}' ".format(user_id, book_title)
+        query = "SELECT * FROM reviews WHERE {}".format(condition)
+        cursor.execute(query)
+        res = cursor.fetchone()
+        return int.from_bytes(res['like_'], byteorder='big', signed=True) == 1
+    return False

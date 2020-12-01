@@ -88,7 +88,10 @@ class Bot:
         text = full_request[index_of_func_sepperator + 1:]
         # func = self.__handler.get(command)
         # x = self.__handler.get('/start')
-        return self.__handler[command](text)
+        try:
+            return self.__handler.get(command)(text)
+        except:
+            return
         pass
 
     def start(self, text):
@@ -124,13 +127,13 @@ class Bot:
 
     def rate_book(self, text):
         try:
-            split_index = text.index[',']
+            split_index = text.index(',')
             book_title = text[:split_index].strip()
             rating = text[split_index + 1:].strip()
             boolean_rating = True if rating == "pos" else False
             funcs.rate_book(self.user_id, book_title, boolean_rating)
             message = "Your rating has been saved"
-        except:
+        except :
             message = "Your operation failed. Please follow this format:\n" \
                       "/rate_book <bookname> , <pos/neg>"
 
