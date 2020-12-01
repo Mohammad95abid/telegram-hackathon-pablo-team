@@ -1,12 +1,23 @@
-from paplo_db_api import get_review_by_user_id,get_all_users_id
+
+
+from paplo_db_api import get_review_by_user_id,get_all_users_id,is_user_exist,add_book_rating,create_user
 import random
 import goodreads_api_client as gr
+def is_user_exist(user_id):
+    return is_user_exist(user_id)
+def get_description(book_title):
+    client = gr.Client(developer_key='q5QJR1BpwdBHs7SLjH0mw')
+    book = client.Book.title(book_title)
+    print(book)
 
-#def get_description(book_title):
- #   client = gr.Client(developer_key='q5QJR1BpwdBHs7SLjH0mw')
-  #  book = client.Book.title(book_title)
-   # print(book)
-
+def rate_book(user_id,book_title,is_like,*args):
+    if is_user_exist(user_id):
+        add_book_rating(book_title,user_id,is_like)
+    else:
+        first_name=args[0]
+        last_name=args[1]
+        create_user(user_id,first_name,last_name)
+        add_book_rating(book_title,user_id,is_like)
 def get_recommendation_author(user_id, book_title):
     client = gr.Client(developer_key='q5QJR1BpwdBHs7SLjH0mw')
     book = client.Book.title(book_title)
@@ -61,4 +72,4 @@ def get_book(user_id):
     return random.choice(new_book_to_recommend)
 
 
-#get_description("The Last Wish (The Witcher, #0.5)")
+get_description("The Last Wish (The Witcher, #0.5)")
