@@ -1,6 +1,7 @@
 from flask import request
 import recommendition_funcs as funcs
 import config
+import requests
 
 ''' 
 Commands:
@@ -85,8 +86,8 @@ class Bot:
             index_of_func_sepperator = len(full_request)
         command = full_request[:index_of_func_sepperator]
         text = full_request[index_of_func_sepperator + 1:]
-        func = self.__handler.get(command)
-        x = self.__handler.get('/start')
+        # func = self.__handler.get(command)
+        # x = self.__handler.get('/start')
         return self.__handler[command](text)
         pass
 
@@ -168,5 +169,5 @@ class Bot:
 
     def send_message_to_user(self, message):
         res = requests.get("https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}"
-                           .format(config.TOKEN, self.chat_id, message))
+                           .format(config.TOKEN, self.user_id, message))
         return res
