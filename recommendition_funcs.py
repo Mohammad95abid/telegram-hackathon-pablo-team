@@ -1,9 +1,15 @@
 
 
-from paplo_db_api import get_review_by_user_id,get_all_users_id,add_book_rating,create_user,add_book,is_book_review_exist,update_review
+from paplo_db_api import *
 import random
+import re
 from  paplo_db_api import  is_user_exist as exist
 import goodreads_api_client as gr
+def cleanhtml(raw_html):
+  cleanr = re.compile('<.*?>')
+  cleantext = re.sub(cleanr, '', raw_html)
+  return cleantext
+
 def is_user_exist(user_id):
     return exist(user_id)
 def get_description(book_title):
@@ -19,7 +25,10 @@ def rate_book(user_id,book_title,is_like,*args):
 
     if not is_book_exist(book_title):
         description=get_description(book_title)
-        add_book(book_title,description,"not found","not found","action")
+        description=cleanhtml(description)
+        description=description[:350]
+        description.replace("\'","")
+        add_book(book_title,description,None,None,"action")
 
     update_review(book_title,user_id,is_like)
 
@@ -40,7 +49,7 @@ def get_review_by_booktitle(user_reviews,book_title):
             return review
     return None
 
-def get_book1(user_id):
+def get_recomndition_book(user_id):
     user_reviews = get_review_by_user_id(user_id)
     all_user = get_all_users_id()
     max = 0
@@ -59,10 +68,12 @@ def get_book1(user_id):
             if cur_review == None:
                 book_to_recommend.append(review['book_title'])
                 continue
-            if (bool(cur_review['like_']) == True and bool(review['like_']) == False) or (bool(cur_review['like_']) == False and bool(review['like_']) == True):
+            is_like1=is_user_like_a_book(cur_review['book_title'],cur_review['user_id'])
+            is_like2=is_user_like_a_book(review['book_title'],review['user_id'])
+            if (is_like1 == True and is_like2 == False) or (is_like1 == False and is_like2 == True):
                 similarity-=1
 
-            elif (bool(cur_review['like_']) == True and bool(review['like_']) == True) or (bool(cur_review['like_']) == False and bool(review['like_']) == False):
+            elif (is_like1 == False and is_like2 == False) or (is_like1 == True and is_like2 == True) :
                 similarity+=1
 
         if max_similarty_user == None:
@@ -77,5 +88,8 @@ def get_book1(user_id):
 
     return random.choice(new_book_to_recommend)
 
-#print(get_book("esv12335"))
+print(get_recomndition_book("15egT4"))
+#rate_book("123","My Book2",False,"serigio","ramos")
+rate_book("eut12335","Best Mystery Books",False)
+
 #print(get_description("The Last Wish (The Witcher, #0.5)"))
