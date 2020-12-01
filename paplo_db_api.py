@@ -1,14 +1,37 @@
-import pymysql
+from config import connection
+import db_api_utils as utils
+from paplo_exceptions import DBException
 
 
 def create_user(user_id, user_first_name, user_last_name):
-    pass
+    if not utils.is_valid(user_id, user_first_name, user_last_name):
+        raise DBException("Invalid user details.")
+    try:
+        with connection.cursor() as cursor:
+            cols = '(user_id, first_name, last_name)'
+            vals = "values ('{}', '{}', '{}')".format(user_id, user_first_name, user_last_name)
+            query = 'INSERT into users {} {}'.format(cols, vals)
+            cursor.execute(query)
+            connection.commit()
+    except Exception as e:
+        print("Error Occurred: ", str(e) )
 
 '''
 Checks if book exists, and if it doesnt, it inserts it into the Books table
 '''
 def add_book(book_title, book_description, book_purchase_link, book_audio_link, book_genre):
-    pass
+    if not utils.is_valid(book_title, book_description, book_purchase_link, book_audio_link, book_genre):
+        raise DBException("Invalid user details.")
+    try:
+        with connection.cursor() as cursor:
+            cols = '(title, description_, link_to_buy, audio_book, genre)'
+            vals = "values ('{}', '{}', '{}', '{}', '{}')".format(book_title, book_description,
+                                                      book_purchase_link, book_audio_link, book_genre)
+            query = 'INSERT into books {} {}'.format(cols, vals)
+            cursor.execute(query)
+            connection.commit()
+    except Exception as e:
+        print("Error Occurred: ", str(e))
 
 
 def get_recommendation(user_id):
@@ -71,6 +94,12 @@ def get_review(book_title, user_id, rating: bool = None):
     return get_review_with_specific_rating(book_title, user_id, rating)
 
 
+# Queries
 
+def get_review_by_user_id(user_id):
+    pass
+
+def get_all_users_id():
+    pass
 
 
