@@ -1,6 +1,8 @@
 from flask import request
-import recommendition_funcs
-'''
+import recommendition_funcs as funcs
+import config
+
+''' 
 Commands:
 
 1)/start
@@ -56,6 +58,7 @@ class Bot:
         self.first_name = personal_data['first_name']
         self.last_name = personal_data['last_name']
         self.user_id = personal_data['id']
+        self.create_handler_of_bot()
 
     def create_handler_of_bot(self):
         self.__handler["/start"] = self.start
@@ -75,20 +78,69 @@ class Bot:
         pass
 
     def function_handler(self):
-
+        full_request = self.my_request.get_json()["message"]["text"]
+        try:
+            index_of_func_sepperator = full_request.index(' ')
+        except:
+            index_of_func_sepperator = len(full_request)
+        command = full_request[:index_of_func_sepperator]
+        text = full_request[index_of_func_sepperator + 1:]
+        func = self.__handler.get(command)
+        x = self.__handler.get('/start')
+        return self.__handler[command](text)
         pass
 
-    def start(self, *args):
-        pass
+    def start(self, text):
+        if funcs.is_user_exist(self.user_id):
+            message = f"Welcome back {self.first_name} {self.last_name}"
+            res = self.send_message_to_user(message)
+            return
+        funcs.create_user(self.user_id, self.first_name, self.last_name)
+        message = f"Greetings {self.first_name} {self.last_name}. And welcome to Pablo"
+        res = self.send_message_to_user(message)
+        return
 
-    def get_description_of_bot(self, *args):
-        pass
+    def get_description_of_bot(self, text):
+        message = '''
+        This Bot is made to help Bookworms through their thrilling learning odyssey.\n Pablo is capable of
+        The following actions using the following commands:\n
+        1)/start: welcomes back old users and create a new user for new users\n
+        2)/description: returns a description of the bot\n
+        3)/rate_book: given the name of a book and a rating, we will add that book to your profile\n
+        4)/get_recommendation: Presents you with 3 books that will be tailored to your taste\n
+        5)/get_library: Shows you the books you have enjoyed\n
+        6)/review_book: Given the name of a book, gives you the freedom to write a review of the book, whether you liked it or not\n
+        7)/get_review: Given the name of a book, returns a review of the book\n
+        8)/get_recommendation_by_genre: Given the name of a book, returns 3 books from the same genre\n
+        9)/get_recommendation_by_author: Given the name of a book, returns other books from the same author\n
+        10)/get_purchase_link: Given the name of a book, returns an online link to purchase it\n
+        11)/get_audio_link: Given the name of a book, returns a link for the audio book version of that book\n
+        12)/connect_to_user: Returns the first name and last name of 3 other people who share a similar taste to you\n
+        '''#TODO complete the description
+        res = self.send_message_to_user(message)
+        return
 
-    def rate_book(self, *args):
+
+    def rate_book(self, text):
+        try:
+            split_index = text.index[',']
+            book_title = text[:split_index].strip()
+            rating = text[split_index + 1:].strip()
+            boolean_rating = True if rating == "pos" else False
+            funcs.rate_book(self.user_id, book_title, boolean_rating)
+            message = "Your rating has been saved"
+        except:
+            message = "Your operation failed. Please follow this format:\n" \
+                      "/rate_book <bookname> , <pos/neg>"
+
+        self.send_message_to_user(message)
         pass
 
     def get_recommendation(self, *args):
-        pass
+        title = funcs.get_book(self.user_id)
+        message = f"I hope you enjoy reading {title}"
+        self.send_message_to_user(message)
+        return
 
     def get_library(self, *args):
         pass
@@ -114,3 +166,7 @@ class Bot:
     def connect_to_user(self, *args):
         pass
 
+    def send_message_to_user(self, message):
+        res = requests.get("https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}"
+                           .format(config.TOKEN, self.chat_id, message))
+        return res
