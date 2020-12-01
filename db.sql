@@ -20,5 +20,7 @@ CREATE TABLE Reviews(
     like_ bit,
     review VARCHAR(250),
     FOREIGN KEY(user_id) REFERENCES Users(user_id),
-    FOREIGN KEY(book_title) REFERENCES Books(title)
+    FOREIGN KEY(book_title) REFERENCES Books(title),
+	primary key(user_id, book_title)
 );
+
