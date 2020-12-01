@@ -1,3 +1,4 @@
+use paplo;
 
 CREATE TABLE Users(
     user_id VARCHAR(50) NOT NULL PRIMARY KEY,
@@ -7,11 +8,13 @@ CREATE TABLE Users(
 
 CREATE TABLE Books(
     title VARCHAR(100) NOT NULL PRIMARY KEY,
-    description VARCHAR(500),
+    description_ VARCHAR(500),
     link_to_buy VARCHAR(100),
     audio_book VARCHAR(100),
     genre VARCHAR(50)
 );
+
+drop table Books;
 
 CREATE TABLE Reviews(
     user_id VARCHAR(50),
