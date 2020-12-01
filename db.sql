@@ -14,8 +14,6 @@ CREATE TABLE Books(
     genre VARCHAR(50)
 );
 
-drop table Books;
-
 CREATE TABLE Reviews(
     user_id VARCHAR(50),
     book_title VARCHAR(100),

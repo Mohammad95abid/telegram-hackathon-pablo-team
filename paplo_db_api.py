@@ -193,8 +193,39 @@ def get_all_users_id():
 
 
 def show_table(table_name):
+    if not utils.is_valid(table_name):
+        raise DBException("Invalid table name details.")
     with connection.cursor() as cursor:
         query = "SELECT * FROM {}".format(table_name)
         cursor.execute(query)
         result = cursor.fetchall()
         print(result)
+
+def is_book_exist(book_title):
+    if not utils.is_valid(book_title):
+        raise DBException("Invalid book title details.")
+    with connection.cursor() as cursor:
+        condition = "title like '{}' ".format( book_title )
+        query = "SELECT * FROM books WHERE {}".format(condition)
+        cursor.execute(query)
+        return len(cursor.fetchall()) > 0
+
+def get_book(book_title):
+    if not utils.is_valid(book_title):
+        raise DBException("Invalid book title details.")
+    with connection.cursor() as cursor:
+        condition = "title like '{}' ".format( book_title )
+        query = "SELECT * FROM books WHERE {}".format(condition)
+        cursor.execute(query)
+        return cursor.fetchone()
+
+def is_user_like_a_book(book_title, user_id):
+    if not utils.is_valid(user_id):
+        raise DBException("Invalid user details.")
+    with connection.cursor() as cursor:
+        condition = "user_id like '{}' and book_title like '{}' ".format(user_id, book_title)
+        query = "SELECT * FROM reviews WHERE {}".format(condition)
+        cursor.execute(query)
+        res = cursor.fetchone()
+        return int.from_bytes(res['like_'], byteorder='big', signed=True) == 1
+    return False

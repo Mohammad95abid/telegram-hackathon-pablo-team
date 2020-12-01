@@ -12,7 +12,7 @@ if __name__ == '__main__':
     print(db.add_book("My Book", "Action Book", "No-link", "No-link", "Actions"))
     # create reviews raws
     print(db.update_review("My Book", "esv12335", False))
-    print(print(db.update_review("My Book","15egT4", True, "Wow!")))
+    print(db.update_review("My Book","15egT4", True, "Wow!"))
     print(db.update_review("My Book", "eut12335", True))
     #   to update a review description of exist review
     # print(db.update_review("My Book", "esv12335", None, "Wow!1222"))
