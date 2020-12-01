@@ -1,5 +1,5 @@
 from flask import request
-
+import recommendition_funcs
 '''
 Commands:
 
@@ -45,34 +45,37 @@ class Bot:
         self.first_name = None
         self.last_name = None
         self.user_id = None
-        self.handler = dict()
-        self.fill_bot_data(myrequest)
+        self.__handler = dict()
+        self.my_request = myrequest
+        self.fill_bot_data()
 
-    def fill_bot_data(self, my_request:request):
-        request_json = my_request.get_json()['message']
+    def fill_bot_data(self):
+        self.my_request
+        request_json = self.my_request.get_json()['message']
         personal_data = request_json['from']
         self.first_name = personal_data['first_name']
         self.last_name = personal_data['last_name']
         self.user_id = personal_data['id']
 
     def create_handler_of_bot(self):
-        self.handler["/start"] = self.start
-        self.handler["/description"] = self.get_description_of_bot
-        self.handler["/rate_book"] = self.rate_book
-        self.handler["/get_recommendation"] = self.get_recommendation
-        self.handler["/get_library"] = self.get_library
-        self.handler["/review_book"] = self.review_book
-        self.handler["/get_review"] = self.get_review
-        self.handler["/get_recommendation_by_genre"] = self.get_recommendation_by_genre
-        self.handler["/get_recommendation_by_author"] = self.get_recommendation_by_author
-        self.handler["/get_purchase_link"] = self.get_purchase_link
-        self.handler["/get_audio_link"] = self.get_audio_link
-        self.handler["/connect_to_user"] = self.connect_to_user
+        self.__handler["/start"] = self.start
+        self.__handler["/description"] = self.get_description_of_bot
+        self.__handler["/rate_book"] = self.rate_book
+        self.__handler["/get_recommendation"] = self.get_recommendation
+        self.__handler["/get_library"] = self.get_library
+        self.__handler["/review_book"] = self.review_book
+        self.__handler["/get_review"] = self.get_review
+        self.__handler["/get_recommendation_by_genre"] = self.get_recommendation_by_genre
+        self.__handler["/get_recommendation_by_author"] = self.get_recommendation_by_author
+        self.__handler["/get_purchase_link"] = self.get_purchase_link
+        self.__handler["/get_audio_link"] = self.get_audio_link
+        self.__handler["/connect_to_user"] = self.connect_to_user
 
     def check_uncompleted_actions(self):
         pass
 
-    def function_handler(self, message, *args):
+    def function_handler(self):
+
         pass
 
     def start(self, *args):
