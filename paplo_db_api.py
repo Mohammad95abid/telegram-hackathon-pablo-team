@@ -34,6 +34,7 @@ def add_book(book_title, book_description, book_purchase_link, book_audio_link, 
         print("Error Occurred: ", str(e))
 
 
+"""
 def get_recommendation(user_id):
     pass
 
@@ -45,6 +46,7 @@ def get_recommendation_genre(user_id, book_title):
 def get_recommendation_author(user_id, book_title):
     pass
 
+"""
 
 def add_book_rating(book_title, user_id, rating: bool):
     pass
@@ -71,7 +73,7 @@ In case there is a review without a title. Then we check if there exists a row w
 '''
 def update_review(book_title, user_id, rating = None, review = None):
     if rating is None and review is None:
-        raise Exception("There need to be information to add")
+        raise DBException("There need to be information to add")
     if rating is None:
         #TODO make sure you check that book exists. If it doesnt, ask the user for a rating
         return add_book_review(book_title, user_id, review)
@@ -97,9 +99,15 @@ def get_review(book_title, user_id, rating: bool = None):
 # Queries
 
 def get_review_by_user_id(user_id):
-    pass
+    with connection.cursor() as cursor:
+        query = "SELECT * FROM users WHERE user_id like {}".format(user_id)
+        cursor.execute(query)
+        return cursor.fetchall()
 
 def get_all_users_id():
-    pass
+    with connection.cursor() as cursor:
+        query = "SELECT * FROM reviews"
+        cursor.execute(query)
+        return cursor.fetchall()
 
 
