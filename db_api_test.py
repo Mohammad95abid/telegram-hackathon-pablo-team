@@ -25,5 +25,10 @@ if __name__ == '__main__':
     # print(db.update_review("My Book", "15egT4", None, "Wow!1222"))
     # print(db.update_review("My Book", "12335"))
     # print(db.update_review("My Book", "1tegT4", None, "rrrrrrr"))
+    # True
+    print( db.is_user_like_a_book("My Book", "ea12335") )
+    # False
+    print(db.is_user_like_a_book("My Book", "esv12335"))
     pass
+
 
