@@ -1,5 +1,3 @@
-
-
 from paplo_db_api import *
 import random
 import re
