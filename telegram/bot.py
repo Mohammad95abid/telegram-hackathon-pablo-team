@@ -53,7 +53,6 @@ class Bot:
         self.fill_bot_data()
 
     def fill_bot_data(self):
-        self.my_request
         request_json = self.my_request.get_json()['message']
         personal_data = request_json['from']
         self.first_name = personal_data['first_name']
