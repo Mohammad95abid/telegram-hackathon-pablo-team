@@ -92,9 +92,10 @@ def get_recomndition_book(user_id):
 
     return random.choice(new_book_to_recommend)
 
+
+
 #print(get_recomndition_book("15egT4"))
 #rate_book("123","My Book2",False,"serigio","ramos")
 #rate_book("eut12335","Best Mystery Books",False)
 #rate_book("eut12335","1984, George Orwell",True)
-
 #print(get_description("The Last Wish (The Witcher, #0.5)"))
