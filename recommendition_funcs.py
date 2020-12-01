@@ -1,5 +1,3 @@
-
-
 from paplo_db_api import get_review_by_user_id,get_all_users_id
 import random
 import goodreads_api_client as gr
@@ -8,6 +6,7 @@ import goodreads_api_client as gr
  #   client = gr.Client(developer_key='q5QJR1BpwdBHs7SLjH0mw')
   #  book = client.Book.title(book_title)
    # print(book)
+
 def get_recommendation_author(user_id, book_title):
     client = gr.Client(developer_key='q5QJR1BpwdBHs7SLjH0mw')
     book = client.Book.title(book_title)
@@ -16,6 +15,7 @@ def get_recommendation_author(user_id, book_title):
     random_book=random.randint(0,len(client.Author.books(auth_id)['book'])-1)
     book_to_recommend = client.Author.books(auth_id)['book'][random_book]['title']
     return book_to_recommend
+
 def get_review_by_booktitle(user_reviews,book_title):
     for review in user_reviews:
         if review['book_title'] == book_title:
