@@ -26,8 +26,12 @@ def rate_book(user_id,book_title,is_like,*args):
     if not is_book_exist(book_title):
         description=get_description(book_title)
         description=cleanhtml(description)
-        description=description[:350]
-        description.replace("\'","")
+        description=description[:400]
+        description = list(description)
+        description.remove("'")
+        description=''.join(description)
+        #description.replace("\'","")
+
         add_book(book_title,description,None,None,"action")
 
     update_review(book_title,user_id,is_like)
@@ -88,8 +92,9 @@ def get_recomndition_book(user_id):
 
     return random.choice(new_book_to_recommend)
 
-print(get_recomndition_book("15egT4"))
+#print(get_recomndition_book("15egT4"))
 #rate_book("123","My Book2",False,"serigio","ramos")
-rate_book("eut12335","Best Mystery Books",False)
+#rate_book("eut12335","Best Mystery Books",False)
+#rate_book("eut12335","1984, George Orwell",True)
 
 #print(get_description("The Last Wish (The Witcher, #0.5)"))
