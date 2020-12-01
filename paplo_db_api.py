@@ -23,14 +23,23 @@ def create_user(user_id, user_first_name, user_last_name):
 Checks if book exists, and if it doesnt, it inserts it into the Books table
 '''
 def add_book(book_title, book_description, book_purchase_link, book_audio_link, book_genre):
-    if not utils.is_valid(book_title, book_description, book_purchase_link, book_audio_link, book_genre):
+    if not utils.is_valid(book_title, book_description, book_genre):
         raise DBException("Invalid book details.")
     try:
         with connection.cursor() as cursor:
             cols = '(title, description_, link_to_buy, audio_book, genre)'
             vals = "values ('{}', '{}', '{}', '{}', '{}')".format(book_title, book_description,
-                                                      book_purchase_link, book_audio_link, book_genre)
+                                                                  book_purchase_link, book_audio_link, book_genre)
+            if book_purchase_link is  None and book_audio_link is  None:
+                vals = "values ('{}', '{}', NULL, NULL, '{}');".format(book_title, book_description, book_genre)
+            elif book_purchase_link is  None:
+                vals = "values ('{}', '{}', NULL, '{}', '{}');".format(book_title, book_description,
+                                                       book_audio_link, book_genre)
+            elif book_audio_link is  None:
+                vals = "values ('{}', '{}', '{}', NULL, '{}');".format(book_title, book_description,
+                                                                       book_purchase_link, book_genre)
             query = 'INSERT into books {} {}'.format(cols, vals)
+            print(query)
             cursor.execute(query)
             connection.commit()
             return True
