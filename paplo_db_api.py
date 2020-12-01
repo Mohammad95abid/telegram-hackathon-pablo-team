@@ -94,6 +94,12 @@ def get_review(book_title, user_id, rating: bool = None):
     return get_review_with_specific_rating(book_title, user_id, rating)
 
 
+# Queries
 
+def get_review_by_user_id(user_id):
+    pass
+
+def get_all_users_id():
+    pass
 
 
