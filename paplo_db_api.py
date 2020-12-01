@@ -13,15 +13,18 @@ def create_user(user_id, user_first_name, user_last_name):
             query = 'INSERT into users {} {}'.format(cols, vals)
             cursor.execute(query)
             connection.commit()
+            return True
     except Exception as e:
-        print("Error Occurred: ", str(e) )
+        message = "Error Occurred: " + str(e)
+        raise DBException(message)
+    return False
 
 '''
 Checks if book exists, and if it doesnt, it inserts it into the Books table
 '''
 def add_book(book_title, book_description, book_purchase_link, book_audio_link, book_genre):
     if not utils.is_valid(book_title, book_description, book_purchase_link, book_audio_link, book_genre):
-        raise DBException("Invalid user details.")
+        raise DBException("Invalid book details.")
     try:
         with connection.cursor() as cursor:
             cols = '(title, description_, link_to_buy, audio_book, genre)'
@@ -30,9 +33,11 @@ def add_book(book_title, book_description, book_purchase_link, book_audio_link, 
             query = 'INSERT into books {} {}'.format(cols, vals)
             cursor.execute(query)
             connection.commit()
+            return True
     except Exception as e:
-        print("Error Occurred: ", str(e))
-
+        message = "Error Occurred: " + str(e)
+        raise DBException(message)
+    return False
 
 """
 def get_recommendation(user_id):
@@ -48,17 +53,71 @@ def get_recommendation_author(user_id, book_title):
 
 """
 
+def is_book_review_exist(book_title, user_id):
+    with connection.cursor() as cursor:
+        condition = "user_id like '{}' and book_title like '{}' ".format(user_id, book_title)
+        query = "SELECT * FROM reviews WHERE {}".format(condition)
+        cursor.execute(query)
+        return len(cursor.fetchall()) > 0
+
+def is_user_exist(user_id):
+    ust = type( user_id )
+    with connection.cursor() as cursor:
+        condition = "user_id like '{}' ".format(user_id)
+        query = "SELECT * FROM users WHERE {}".format(condition)
+        cursor.execute(query)
+        return len( cursor.fetchall() ) > 0
+
 def add_book_rating(book_title, user_id, rating: bool):
-    pass
+    try:
+        with connection.cursor() as cursor:
+            # there are two cases, add new review when no instance of both book_title, user_id in the table
+            # otherwise just update the exist raw with new rating
+            # make add query
+            like_ = 1 if rating else 0
+            cols = '(user_id, book_title, like_)'
+            vals = "('{}', '{}', b'{}')".format(user_id, book_title, like_)
+            query = 'INSERT into reviews {} values {}'.format(cols, vals)
+            if is_book_review_exist(book_title, user_id):
+                # make update query
+                condition = "user_id = '{}' and book_title = '{}'".format(user_id, book_title)
+                query = "UPDATE reviews SET like_ = b'{}' WHERE {}".format(like_, condition)
+            cursor.execute(query)
+            connection.commit()
+            return True
+    except Exception as e:
+        message = "Error Occurred: " + str(e)
+        raise DBException(message)
+    return False
 
 
 def add_book_review(book_title, user_id, review):
-    pass
-
+    try:
+        with connection.cursor() as cursor:
+            condition = "user_id = '{}' and book_title = '{}'".format(user_id, book_title)
+            query = "UPDATE reviews SET review = '{}' WHERE {}".format(review, condition)
+            cursor.execute(query)
+            connection.commit()
+            return True
+    except Exception as e:
+        message = "Error Occurred: " + str(e)
+        raise DBException(message)
+    return False
 
 def add_book_rating_review(book_title, user_id, rating = None, review = None):
-    pass
-
+    try:
+        with connection.cursor() as cursor:
+            like_  = 1 if rating else 0
+            cols = '(user_id, book_title, like_, review)'
+            vals = "('{}', '{}', b'{}', '{}')".format(user_id, book_title, like_, review)
+            query = 'INSERT into reviews {} values {}'.format(cols, vals)
+            cursor.execute(query)
+            connection.commit()
+            return True
+    except Exception as e:
+        message = "Error Occurred: " + str(e)
+        raise DBException(message)
+    return False
 
 '''
 takes the book title, the user id, a positive or negative rating and a review. 
@@ -72,42 +131,70 @@ In case there is a review without a title. Then we check if there exists a row w
     review given to us as a parameter.
 '''
 def update_review(book_title, user_id, rating = None, review = None):
-    if rating is None and review is None:
+    if not utils.is_valid(book_title, user_id):
+        raise DBException("Invalid book, user details.")
+    elif rating is None and not is_user_exist(user_id):
+        raise DBException("user not exist in the system")
+    elif rating is None and review is None:
         raise DBException("There need to be information to add")
-    if rating is None:
+    elif rating is None and is_book_review_exist(book_title, user_id):
         #TODO make sure you check that book exists. If it doesnt, ask the user for a rating
         return add_book_review(book_title, user_id, review)
-    if review is None:
-        add_book_rating(book_title, user_id, rating)
+    elif review is None:
+        return add_book_rating(book_title, user_id, rating)
     return add_book_rating_review(book_title, user_id, rating, review)
 
 
 def get_review_with_specific_rating(book_title, user_id, rating:bool):
-    pass
+    with connection.cursor() as cursor:
+        rating = 1 if rating else 0
+        condition = "user_id like '{}' and book_title like '{}' and like_ = b'{}'"\
+            .format(user_id, book_title, rating)
+        query = "SELECT * FROM reviews WHERE {}".format(condition)
+        cursor.execute(query)
+        return cursor.fetchone()
 
 
 def get_review_without_rating(book_title, user_id):
-    pass
+    with connection.cursor() as cursor:
+        query = "SELECT * FROM reviews WHERE user_id like '{}' and book_title like '{}'" \
+            .format(user_id, book_title)
+        cursor.execute(query)
+        return cursor.fetchone()
 
 
 def get_review(book_title, user_id, rating: bool = None):
+    if not utils.is_valid(book_title, user_id):
+        raise DBException("Invalid book, user details.")
     if rating is None:
         return get_review_without_rating(book_title, user_id)
     return get_review_with_specific_rating(book_title, user_id, rating)
 
 
 # Queries
-
+'''
+a function to get all book reviews for this user
+parameters: user id
+return a list of dictionaries, each one is the book reviewed by the user
+'''
 def get_review_by_user_id(user_id):
+    if not utils.is_valid(user_id):
+        raise DBException("Invalid user details.")
     with connection.cursor() as cursor:
-        query = "SELECT * FROM users WHERE user_id like {}".format(user_id)
+        query = "SELECT * FROM reviews WHERE user_id like '{}'".format(user_id)
         cursor.execute(query)
         return cursor.fetchall()
 
 def get_all_users_id():
     with connection.cursor() as cursor:
-        query = "SELECT * FROM reviews"
+        query = "SELECT user_id FROM users"
         cursor.execute(query)
         return cursor.fetchall()
 
 
+def show_table(table_name):
+    with connection.cursor() as cursor:
+        query = "SELECT * FROM {}".format(table_name)
+        cursor.execute(query)
+        result = cursor.fetchall()
+        print(result)
