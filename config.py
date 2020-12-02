@@ -1,5 +1,3 @@
-
-
 import pymysql
 
 
@@ -20,7 +18,7 @@ URL = TELEGRAM_HOST + TOKEN + SET_WEBHOOK + NGROK
 connection = pymysql.connect(
     host="localhost",
     user="root",
-    password="root",
+    password="umrulz",
     db="paplo",
     charset="utf8",
     cursorclass=pymysql.cursors.DictCursor
