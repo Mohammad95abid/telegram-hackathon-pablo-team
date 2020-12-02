@@ -18,7 +18,8 @@ def is_user_exist(user_id):
 def get_description(book_title):
     client = gr.Client(developer_key='q5QJR1BpwdBHs7SLjH0mw')
     book = client.Book.title(book_title)
-    return book['description']
+    description = cleanhtml(book['description'])
+    return escape_single_quote( description )
 
 def get_book_id(book_title):
     client = gr.Client(developer_key='<q5QJR1BpwdBHs7SLjH0mw>')
@@ -67,7 +68,6 @@ def rate_book(user_id,book_title,is_like,*args):
         description=get_description(book_title)
         if description is None:
             description = "No description found, This is a new book in the system!"
-        description=cleanhtml(description)
         description=description[:400]
         # description = list(description)
         # if "'" in description:
@@ -137,9 +137,6 @@ def get_recomndition_book(user_id):
     if len(new_book_to_recommend) > 0:
         return random.choice(new_book_to_recommend)
 
-def get_book_description(book_title):
-        pass
-
 def review_book(user_id, book_title, review):
     return update_review(book_title, user_id, None, review)
 
@@ -149,3 +146,4 @@ def review_book(user_id, book_title, review):
 #rate_book("eut12335","Best Mystery Books",False)
 #rate_book("eut12335","1984, George Orwell",True)
 #print(get_description("The Last Wish (The Witcher, #0.5)"))
+
