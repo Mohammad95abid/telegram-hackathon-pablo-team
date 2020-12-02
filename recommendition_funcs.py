@@ -3,6 +3,10 @@ import random
 import re
 from  paplo_db_api import  is_user_exist as exist
 import goodreads_api_client as gr
+
+def escape_single_quote(text):
+    return text.replace("'","`")
+
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
   cleantext = re.sub(cleanr, '', raw_html)
@@ -20,6 +24,8 @@ def rate_book(user_id,book_title,is_like,*args):
     if not exist(user_id):
         first_name=args[0]
         last_name=args[1]
+        first_name = escape_single_quote(first_name)
+        last_name = escape_single_quote(last_name)
         create_user(user_id,first_name,last_name)
 
     if not is_book_exist(book_title):
@@ -28,10 +34,11 @@ def rate_book(user_id,book_title,is_like,*args):
             description = "No description found, This is a new book in the system!"
         description=cleanhtml(description)
         description=description[:400]
-        description = list(description)
-        if "'" in description:
-            description.remove("'")
-        description=''.join(description)
+        # description = list(description)
+        # if "'" in description:
+        #     description.remove("'")
+        # description=''.join(description)
+        description = escape_single_quote(description)
 
         add_book(book_title,description,None,None,"action")
 
@@ -47,15 +54,17 @@ def get_recommendation_author(user_id, book_title):
     auth_id = book['authors']['author'][random_author]['id']
     random_book=random.randint(0,len(client.Author.books(auth_id)['book'])-1)
     book_to_recommend = client.Author.books(auth_id)['book'][random_book]['title']
-    return book_to_recommend
+    return escape_single_quote(book_to_recommend)
 
 def get_review_by_booktitle(user_reviews,book_title):
+    book_title = escape_single_quote(book_title)
     for review in user_reviews:
         if review['book_title'] == book_title:
             return review
     return None
 
 def get_recomndition_book(user_id):
+    user_id = str(user_id)
     user_reviews = get_review_by_user_id(user_id)
     all_user = get_all_users_id()
     max = 0
@@ -68,7 +77,7 @@ def get_recomndition_book(user_id):
         if user['user_id'] == user_id:
             continue
         cur_user_reviews = get_review_by_user_id(user['user_id'])
-
+        print("user id = {}, other user = {}, reviews = {}".format(user_id, user['user_id'], cur_user_reviews))
         for review in cur_user_reviews:
             cur_review = get_review_by_booktitle(user_reviews, review['book_title'])
             if cur_review == None:
@@ -91,9 +100,16 @@ def get_recomndition_book(user_id):
             max=similarity
             max_similarty_user=user['user_id']
             new_book_to_recommend = book_to_recommend
+    print("new_book_to_recommend list: ", new_book_to_recommend)
+    if len(new_book_to_recommend) > 0:
+        return random.choice(new_book_to_recommend)
+    print("Book Is Empty")
 
-    return random.choice(new_book_to_recommend)
+def get_book_description(book_title):
+        pass
 
+def review_book(user_id, book_title, review):
+    return update_review(book_title, user_id, None, review)
 
 
 #print(get_recomndition_book("15egT4"))

@@ -142,8 +142,10 @@ In case there is a review without a title. Then we check if there exists a row w
 def update_review(book_title, user_id, rating = None, review = None):
     if not utils.is_valid(book_title, user_id):
         raise DBException("Invalid book, user details.")
-    elif rating is None and not is_user_exist(user_id):
+    elif rating is None and not is_user_exist( user_id ):
         raise DBException("user not exist in the system")
+    elif rating is None and not is_book_review_exist(book_title, user_id):
+        raise DBException("Book review not exist in the system")
     elif rating is None and review is None:
         raise DBException("There need to be information to add")
     elif rating is None and is_book_review_exist(book_title, user_id):
