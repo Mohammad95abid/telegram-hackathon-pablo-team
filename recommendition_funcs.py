@@ -26,7 +26,8 @@ def get_book_id(book_title):
     book = client.Book.title(book_title)
     return book['id']
 
-def get_book_genre(book_id):
+def get_book_genres(book_title):
+    book_id = get_book_id(book_title)
     client = gr.Client(developer_key='<q5QJR1BpwdBHs7SLjH0mw>')
     book = client.Book.show(book_id)
     x = book['popular_shelves']
@@ -149,8 +150,18 @@ def get_book_author(book_title):
     res = []
     for elem in authors:
         if elem:
-            res.append( escape_single_quote( elem['name'] ) )
+            try:
+                res.append( escape_single_quote( elem['name'] ) )
+            except TypeError as e:
+                res.append(escape_single_quote( authors['name'] ))
+                break
     return res
+
+def get_all_books_by_author(author_name):
+    pass
+
+# def get_book_by_genre(genre):
+#     pass
 
 #print(get_recomndition_book("15egT4"))
 #rate_book("123","My Book2",False,"serigio","ramos")
@@ -158,3 +169,13 @@ def get_book_author(book_title):
 #rate_book("eut12335","1984, George Orwell",True)
 #print(get_description("The Last Wish (The Witcher, #0.5)"))
 
+if __name__ == '__main__':
+    print("Doon authors => ", get_book_author(get_book_title_from('Doon')))
+    print("My Plain Jane authors => ", get_book_author(get_book_title_from('My Plain Jane')))
+    print("Master authors => ", get_book_author(get_book_title_from('Master')))
+    print("My Sister's Keeper => ", get_book_author(get_book_title_from('My Sisters Keeper')))
+
+
+    print( "finish" )
+
+    # The Fellowship of the Ring (The Lord of the Rings, #1)
