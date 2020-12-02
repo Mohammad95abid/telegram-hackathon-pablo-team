@@ -284,7 +284,6 @@ def get_all_reviews(book_title):
 
 def get_all_review_by_book_title(book_title, ratting = None):
     book_title = escape_single_quote(book_title)
-    if 
     with connection.cursor() as cursor:
         if ratting is None:
             condition = "book_title like '{}'".format(book_title)
