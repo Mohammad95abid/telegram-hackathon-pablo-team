@@ -228,3 +228,53 @@ def get_all_books_by_author(book_title):
 def get_all_recomndition_book(user_id, book_title):
     book_title = escape_single_quote(book_title)
     return get_recommendations_books(user_id, book_title)
+
+# ---------------------------------------similar users ----------------------------------------------
+
+def all_similar_users_helper(user_id):
+    user_id = str(user_id)
+    user_reviews = get_review_by_user_id(user_id)
+    all_user = get_all_users_id()
+    user_to_ret = []
+    for user in all_user:
+        similarity = 0
+        if user['user_id'] == user_id:
+            continue
+        cur_user_reviews = get_review_by_user_id(user['user_id'])
+        for review in cur_user_reviews:
+            cur_review = get_review_by_booktitle(user_reviews, review['book_title'])
+            if cur_review == None:
+                continue
+            is_like1 = is_user_like_a_book(cur_review['book_title'], cur_review['user_id'])
+            is_like2 = is_user_like_a_book(review['book_title'], review['user_id'])
+            if (is_like1 == True and is_like2 == False) or (is_like1 == False and is_like2 == True):
+                similarity -= 1
+
+            elif (is_like1 == False and is_like2 == False) or (is_like1 == True and is_like2 == True):
+                similarity += 1
+        user_to_ret.append((user['user_id'], similarity))
+    return user_to_ret
+
+
+def Sort_Tuple(tup):
+    # getting length of list of tuples
+    lst = len(tup)
+    for i in range(0, lst):
+
+        for j in range(0, lst - i - 1):
+            if (tup[j][1] > tup[j + 1][1]):
+                temp = tup[j]
+                tup[j] = tup[j + 1]
+                tup[j + 1] = temp
+    return tup
+
+
+def get_similar_users(user_id, num_of_users):
+    res = all_similar_users_helper(user_id)
+    res = list( set(res) )
+    res = sorted(res, key=lambda x: x[1], reverse=True)
+    res = res[:num_of_users]
+    return [x[0] for x in res]
+
+
+#     j + i > (k + n) / 2
