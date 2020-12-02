@@ -24,31 +24,20 @@ Commands:
 
 class Bot:
 
-
-    actionDict = dict()
-    # @staticmethod
-    # def fill_empty_action_dict(empty_dict):
-    #     empty_dict["start"] = 0
-    #     empty_dict["rate_book"] = 0
-    #     empty_dict["get_recommendation"] = 0
-    #     empty_dict["get_library"] = 0
-    #     empty_dict["review_book"] = 0
-    #     empty_dict["get_review"] = 0
-    #     empty_dict["get_recommendation_by_genre"] = 0
-    #     empty_dict["get_recommendation_by_author"] = 0
-    #     empty_dict["get_purchase_link"] = 0
-    #     empty_dict["get_audio_link"] = 0
-    #     empty_dict["connect_to_user"] = 0
+    action_dict = dict()
+    connection_dict = dict()
+    bot_dict = dict()
 
     @staticmethod
     def get_action_dict():
-        return Bot.actionDict
+        return Bot.action_dict
 
     @staticmethod
     def get_action(user_id):
         action_dict = Bot.get_action_dict()
         if action_dict.get(user_id, None) is None:
             action_dict[user_id] = None
+            Bot.connection_dict[user_id] = None
         try:
             return action_dict[user_id]["func"]
         except:
@@ -82,6 +71,8 @@ class Bot:
         self.last_name = personal_data['last_name']
         self.user_id = personal_data['id']
         self.create_handler_of_bot()
+        Bot.bot_dict[self.user_id] = self
+        print(Bot.bot_dict[self.user_id])
 
     def create_handler_of_bot(self):
         self.__handler["/start"] = self.start
@@ -106,6 +97,8 @@ class Bot:
         full_request = self.my_request.get_json()["message"]["text"]
         if Bot.get_action(self.user_id) is not None:
             return Bot.get_action(self.user_id)(full_request)
+        if Bot.connection_dict[self.user_id] is not None:
+            return self.connect_to_user_recieve_late(Bot.connection_dict[self.user_id]["text"])
 
         try:
             index_of_func_sepperator = full_request.index(' ')
@@ -116,8 +109,15 @@ class Bot:
         try:
             return self.__handler.get(command)(text)
         except:
-            return
+            return self.unknown_commands_handler()
         pass
+    #todo
+    def unknown_commands_handler(self):
+        message = '''
+        Pablo couldnt understand your command. Use /menu to see a list of all commands.
+        '''
+        res = self.send_message_to_user(message)
+        return
 
     def start(self, text):
         if funcs.is_user_exist(self.user_id):
@@ -155,6 +155,7 @@ class Bot:
         #TODO check if the command still the same
         Bot.set_action(self.user_id, None)
         res = self.send_message_to_user(message)
+        self.check_if_exist_connection()
         return
 
     def review_book(self, text):
@@ -203,6 +204,7 @@ class Bot:
             message = 'Book has been rated'
             Bot.set_action(self.user_id, None)
             res = self.send_message_to_user(message)
+            self.check_if_exist_connection()
             return
         title = Bot.get_parameters(self.user_id)
         Bot.set_action(self.user_id, self.review_book_4, title)
@@ -217,6 +219,7 @@ class Bot:
         message = 'Your review has been added'
         Bot.set_action(self.user_id, None)
         res = self.send_message_to_user(message)
+        self.check_if_exist_connection()
         pass
 
     def get_book_information(self, text):
@@ -372,6 +375,7 @@ class Bot:
         message = 'command exited successfully'
         Bot.set_action(self.user_id, None)
         res = self.send_message_to_user(message)
+        self.check_if_exist_connection()
         pass
 
 
@@ -411,6 +415,7 @@ class Bot:
         message = f"We hope you will enjoy reading\n{title}"
         res = self.send_message_to_user(message)
         Bot.set_action(self.user_id, None)
+        self.check_if_exist_connection()
 
     def get_recommendation_similar_to_book(self, text):
         message = "Please enter the name of the book"
@@ -430,6 +435,7 @@ class Bot:
         message = 'this feature is still to be implemented'
         res = self.send_message_to_user(message)
         Bot.set_action(self.user_id, None)
+        self.check_if_exist_connection()
         pass
     #TODO finish this func
     def get_recommendation_similar_to_author1(self, text):
@@ -437,6 +443,7 @@ class Bot:
         message = 'this feature is still to be implemented'
         res = self.send_message_to_user(message)
         Bot.set_action(self.user_id, None)
+        self.check_if_exist_connection()
         pass
 
     def get_menu_of_bot(self, text):
@@ -505,10 +512,79 @@ class Bot:
     def get_audio_link(self, *args):
         pass
 
-    def connect_to_user(self, *args):
+    def connect_to_user(self, text):
+        message = '''
+        Pablo connects you with the users who have similar literary taste as you, provided that they accept your 
+        invitation. Please enter the amount of people you would like to connect to
+        '''
+        res = self.send_message_to_user(message)
+        Bot.set_action(self.user_id, self.connect_to_user1)
+        pass
+
+    def connect_to_user1(self, text):
+        try:
+            num_of_people = int(text)
+        except:
+            message = "Invalid input. Please enter a number resembling the amount of people you would like to connect to"
+            res = self.send_message_to_user(message)
+            return
+        all_user_ids = ['1442293094']
+
+        #TODO receive a function which returns the top user ids and put it in all_user_ids
+        print(Bot.action_dict)
+        for user_id in all_user_ids:
+            other_bot = Bot.bot_dict[user_id]
+            if Bot.get_action(user_id) is None:
+            # if Bot.action_dict[user_id] is None:
+                message = '''
+                A user with similar literary taste to yours would like to connect with you\n
+                Please insert:\ny to agree to connect\nn to deny the request
+                '''
+                Bot.set_action(user_id, other_bot.connect_to_user_recieve, self.user_id)
+                res = requests.get("https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}"
+                                   .format(config.TOKEN, user_id, message))
+
+            else:
+                Bot.connection_dict[user_id] = {"func" : other_bot.connect_to_user_recieve_late, "text" : self.user_id}
+        message = '''
+        Your connection request has been sent to the most suitable users. In case they would agree to 
+        connect with you, you would receive their username and password
+        '''
+        res = self.send_message_to_user(message)
+
+
+
+    def connect_to_user_recieve(self, text):
+        user_id = Bot.get_parameters(self.user_id)
+        Bot.connection_dict[self.user_id] = None
+        if text == 'y':
+            message = f"User {self.first_name} {self.last_name} agreed to connect with you!"
+            res = requests.get("https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}"
+                               .format(config.TOKEN, user_id, message))
+            Bot.set_action(self.user_id, None)
+            return
+        if text == 'n':
+            Bot.set_action(self.user_id, None)
+            return
+        message = "Pablo couldn't understand your command. Please insert:\ny to agree to connect\nn to deny the request"
+        self.send_message_to_user(message)
+        pass
+
+    def connect_to_user_recieve_late(self, user_id):
+        message = '''A user with similar literary taste to yours would like to connect with you\n
+                Please insert:\ny to agree to connect\nn to deny the request'''
+        Bot.set_action(self.user_id, self.connect_to_user_recieve, user_id)
+        res = requests.get("https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}"
+                           .format(config.TOKEN, self.user_id, message))
+        Bot.connection_dict[self.user_id] = None
+        #TODO check the option to make connection dict a list instead of a single value incase many people connecting
         pass
 
     def send_message_to_user(self, message):
         res = requests.get("https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}"
                            .format(config.TOKEN, self.user_id, message))
         return res
+
+    def check_if_exist_connection(self):
+        if Bot.connection_dict[self.user_id] is not None:
+            return self.connect_to_user_recieve_late(Bot.connection_dict[self.user_id]["text"])
