@@ -73,6 +73,7 @@ class Bot:
         self.__handler["/get_purchase_link"] = self.get_purchase_link
         self.__handler["/get_audio_link"] = self.get_audio_link
         self.__handler["/connect_to_user"] = self.connect_to_user
+        self.__handler["/get_book_description"] = self.get_book_description
 
     def check_uncompleted_actions(self):
         pass
@@ -119,6 +120,7 @@ class Bot:
         10)/get_purchase_link: Given the name of a book, returns an online link to purchase it\n
         11)/get_audio_link: Given the name of a book, returns a link for the audio book version of that book\n
         12)/connect_to_user: Returns the first name and last name of 3 other people who share a similar taste to you\n
+        13) get_book_description: Return the description of the given book\n
         '''#TODO complete the description
         res = self.send_message_to_user(message)
         return
@@ -173,3 +175,9 @@ class Bot:
         res = requests.get("https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}"
                            .format(config.TOKEN, self.user_id, message))
         return res
+
+    def get_book_description(self, book_title):
+        description = funcs.get_book_description(book_title)
+        if description is None:
+            description = "The book not exist in the system"
+        self.send_message_to_user(description)

@@ -94,6 +94,12 @@ def get_recomndition_book(user_id):
 
     return random.choice(new_book_to_recommend)
 
+def get_book_description(book_title):
+        book = get_book(book_title)
+        if book is None:
+            return None
+        res = book['description_']
+        return res
 
 
 #print(get_recomndition_book("15egT4"))
