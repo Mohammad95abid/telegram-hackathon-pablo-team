@@ -429,6 +429,7 @@ class Bot:
     #TODO finish this func
     def get_recommendation_similar_to_book1(self, text):
         title = funcs.get_book_title_from(text)
+
         message = 'this feature is still to be implemented'
         res = self.send_message_to_user(message)
         Bot.set_action(self.user_id, None)
