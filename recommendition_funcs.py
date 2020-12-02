@@ -229,4 +229,5 @@ def get_all_books_by_author(book_title):
     return list(set(res))
 
 def get_all_recomndition_book(user_id, book_title):
+    book_title = escape_single_quote(book_title)
     return get_recommendations_books(user_id, book_title)
