@@ -214,8 +214,69 @@ class Bot:
         pass
 
     def get_book_information(self, text):
+        message = '''
+                Please enter the title of the book about which you want Pablo to give you information
+                '''
+        Bot.set_action(self.user_id, self.get_book_information_1)
+        res = self.send_message_to_user(message)
+        return
+
+    def get_book_information_1(self, text):
+        message = '''
+        Please pick which command you want by inserting:\n
+        1 To read description of book\n
+        2 To get review of book\n
+        3 to get links to purchase\n
+        4 to get author of the book\n
+        5 to exit this command\n
+        '''
+        title = text
+        Bot.set_action(self.user_id, self.get_book_information_handler, title)
+        res = self.send_message_to_user(message)
+        return
+
+    def get_book_information_handler(self, text):
+        title = Bot.get_parameters(self.user_id)
+        if text == '1':
+            return self.get_book_information_description(title)
+        if text == '2':
+            return self.get_book_information_review(title)
+        if text == '3':
+            return self.get_purchase_link(title)
+        if text == '4':
+            return self.get_book_information_author(title)
+        if text == '5':
+            return self.get_book_information_exit(title)
+        message = '''
+        I didnt understand that command.\n please try again using one of the following commands:\n
+        1 To read description of book\n
+        2 To get review of book\n
+        3 to get links to purchase\n
+        4 to get author of the book\n
+        5 to exit this command\n
+        '''
+        res = self.send_message_to_user(message)
+        return
+
+    def get_book_information_description(self, title):
+        description = funcs.get_description(title)
+        message = description +'\n\n\n'
+        res = self.send_message_to_user(message)
+        self.get_book_information_1(title)
+        # Bot.set_action(self.user_id, self.get_book_information_1, title)
         pass
 
+    def get_book_information_review(self, text):
+        pass
+
+    def get_book_information_purchase_link(self, text):
+        pass
+
+    def get_book_information_author(self, text):
+        pass
+
+    def get_book_information_exit(self, text):
+        pass
 
     def get_menu_of_bot(self, text):
         message = '''
