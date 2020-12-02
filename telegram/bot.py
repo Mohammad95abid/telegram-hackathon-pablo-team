@@ -131,23 +131,26 @@ class Bot:
         return
 
     def start_2_1(self, text):
-        funcs.rate_book(self.user_id, text, True)
+        title = funcs.get_book_title_from(text)
+        funcs.rate_book(self.user_id, title, True)
         message = f"first book received"
         Bot.set_action(self.user_id, self.start_2_2)
         res = self.send_message_to_user(message)
         return
 
     def start_2_2(self, text):
-        funcs.rate_book(self.user_id, text, True)
+        title = funcs.get_book_title_from(text)
+        funcs.rate_book(self.user_id, title, True)
         message = f"second book received"
         Bot.set_action(self.user_id, self.start_2_3)
         res = self.send_message_to_user(message)
         return
 
     def start_2_3(self, text):
-        funcs.rate_book(self.user_id, text, True)
+        title = funcs.get_book_title_from(text)
+        funcs.rate_book(self.user_id, title, True)
         message = f"third book received\n" \
-            f"Your profile has been made. Feel free to enrich it by rating additional books using the command \\rate"
+            f"Your profile has been made. Feel free to enrich it by rating additional books using the command: /review_book"
         #TODO check if the command still the same
         Bot.set_action(self.user_id, None)
         res = self.send_message_to_user(message)
@@ -163,10 +166,11 @@ class Bot:
         return
 
     def review_book_1(self, text):
+        title = funcs.get_book_title_from(text)
         message ='''
         Please rate the book by inserting:\n y for a positive rating \n n for a negative rating
         '''
-        Bot.set_action(self.user_id, self.review_book_2, text)
+        Bot.set_action(self.user_id, self.review_book_2, title)
         res = self.send_message_to_user(message)
         return
 
@@ -230,7 +234,7 @@ class Bot:
         4 to get author of the book\n
         5 to exit this command\n
         '''
-        title = text
+        title = funcs.get_book_title_from(text)
         Bot.set_action(self.user_id, self.get_book_information_handler, title)
         res = self.send_message_to_user(message)
         return
@@ -242,7 +246,7 @@ class Bot:
         if text == '2':
             return self.get_book_information_review(title)
         if text == '3':
-            return self.get_purchase_link(title)
+            return self.get_book_information_purchase_link(title)
         if text == '4':
             return self.get_book_information_author(title)
         if text == '5':
@@ -265,17 +269,31 @@ class Bot:
         self.get_book_information_1(title)
         # Bot.set_action(self.user_id, self.get_book_information_1, title)
         pass
-
-    def get_book_information_review(self, text):
+    #TODO finish this func
+    def get_book_information_review(self, title):
+        message = 'This feature is still under development'
+        res = self.send_message_to_user(message)
+        self.get_book_information_1(title)
         pass
 
-    def get_book_information_purchase_link(self, text):
+    def get_book_information_purchase_link(self, title):
+        link = funcs.get_buy_link(title)
+        message = f"You can buy:\n{title}\nby using this link:\n{link}\n\n"
+        print(message)
+        res = self.send_message_to_user(message)
+        self.get_book_information_1(title)
+        pass
+    #TODO finish this func
+    def get_book_information_author(self, title):
+        message = 'This feature is still under development'
+        res = self.send_message_to_user(message)
+        self.get_book_information_1(title)
         pass
 
-    def get_book_information_author(self, text):
-        pass
-
-    def get_book_information_exit(self, text):
+    def get_book_information_exit(self, title):
+        message = 'command exited successfully'
+        Bot.set_action(self.user_id, None)
+        res = self.send_message_to_user(message)
         pass
 
     def get_menu_of_bot(self, text):
