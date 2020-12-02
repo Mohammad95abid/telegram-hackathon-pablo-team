@@ -3,6 +3,8 @@ import random
 import re
 from  paplo_db_api import  is_user_exist as exist
 import goodreads_api_client as gr
+import collections
+
 
 def escape_single_quote(text):
     return text.replace("'","`")
@@ -84,14 +86,14 @@ def rate_book(user_id,book_title,is_like,*args):
 
 
 
-def get_recommendation_author(user_id, book_title):
-    client = gr.Client(developer_key='q5QJR1BpwdBHs7SLjH0mw')
-    book = client.Book.title(book_title)
-    random_author=random.randint(0,len(book['authors']['author'])-1)
-    auth_id = book['authors']['author'][random_author]['id']
-    random_book=random.randint(0,len(client.Author.books(auth_id)['book'])-1)
-    book_to_recommend = client.Author.books(auth_id)['book'][random_book]['title']
-    return escape_single_quote(book_to_recommend)
+# def get_recommendation_author(user_id, book_title):
+#     client = gr.Client(developer_key='q5QJR1BpwdBHs7SLjH0mw')
+#     book = client.Book.title(book_title)
+#     random_author=random.randint(0,len(book['authors']['author'])-1)
+#     auth_id = book['authors']['author'][random_author]['id']
+#     random_book=random.randint(0,len(client.Author.books(auth_id)['book'])-1)
+#     book_to_recommend = client.Author.books(auth_id)['book'][random_book]['title']
+#     return escape_single_quote(book_to_recommend)
 
 def get_review_by_booktitle(user_reviews,book_title):
     book_title = escape_single_quote(book_title)
@@ -171,4 +173,58 @@ def get_review_from_db(ratting = None):
 #rate_book("eut12335","Best Mystery Books",False)
 #rate_book("eut12335","1984, George Orwell",True)
 #print(get_description("The Last Wish (The Witcher, #0.5)"))
+
+def get_recommendation_author(book_title):
+    client = gr.Client(developer_key='q5QJR1BpwdBHs7SLjH0mw')
+    book = client.Book.title(book_title)
+    if type(book['authors']['author']) == collections.OrderedDict:
+        auth_id = book['authors']['author']['id']
+        random_book = random.randint(0, len(client.Author.books(auth_id)['book']) - 1)
+        book_to_recommend = client.Author.books(auth_id)['book'][random_book]['title']
+        return escape_single_quote(book_to_recommend)
+    elif type(book['authors']['author']) == list:
+        random_author = random.randint(0, len(book['authors']['author']) - 1)
+        # for i in range(len(book['authors']['author'])):
+        #     print(book['authors']['author'][i]['id'])
+        auth_id = book['authors']['author'][random_author]['id']
+        random_book = random.randint(0, len(client.Author.books(auth_id)['book']) - 1)
+        book_to_recommend = client.Author.books(auth_id)['book'][random_book]['title']
+        return escape_single_quote(book_to_recommend)
+
+#  ------------------------------ Recommendation ------------------------------
+def get_books_of_Author(book_title):
+    client = gr.Client(developer_key='q5QJR1BpwdBHs7SLjH0mw')
+    book = client.Book.title(book_title)
+    books_to_every_Author = []
+    if type(book['authors']['author'])== collections.OrderedDict:
+        auth_id = book['authors']['author']['id']
+        #random_book = random.randint(0, len(client.Author.books(auth_id)['book']) - 1)
+        #book_to_recommend = client.Author.books(auth_id)['book'][random_book]['title']
+        books_to_every_Author.append(get_books_of_author(auth_id))
+        return books_to_every_Author
+    elif type(book['authors']['author'])== list:
+       # random_author=random.randint(0,len(book['authors']['author'])-1)
+        for i in range(len(book['authors']['author'])):
+            books_to_every_Author.append( get_books_of_author(book['authors']['author'][i]['id']))
+        return books_to_every_Author
+
+
+
+def get_books_of_author(auth_id):
+    client = gr.Client(developer_key='q5QJR1BpwdBHs7SLjH0mw')
+    list_of_books=[]
+    temp=client.Author.books(auth_id)['book']
+    for i in range(len(temp)):
+            if 'average_rating' in temp[i] and float(temp[i]['average_rating']) > 4:
+                list_of_books.append(temp[i]['title'])
+    return list_of_books
+
+
+def get_all_books_by_author(book_title):
+    res = []
+    x = get_books_of_Author(book_title)
+    for y in x:
+        for elem in y:
+            res.append(elem)
+    return list(set(res))
 
