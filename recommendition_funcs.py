@@ -5,10 +5,6 @@ from  paplo_db_api import  is_user_exist as exist
 import goodreads_api_client as gr
 import collections
 
-
-def escape_single_quote(text):
-    return text.replace("'","`")
-
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
   cleantext = re.sub(cleanr, '', raw_html)
