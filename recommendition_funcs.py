@@ -79,9 +79,9 @@ def rate_book(user_id,book_title,is_like,*args):
         # # description=''.join(description)
         # description = escape_single_quote(description)
 
-        add_book(book_title," wow",None,None,"action")
+        add_book(book_title, None, None)
 
-    update_review(book_title,user_id,is_like)
+    update_review(book_title, user_id, is_like)
 
 
 

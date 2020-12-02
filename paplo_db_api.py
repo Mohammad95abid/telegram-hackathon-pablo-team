@@ -136,7 +136,7 @@ In case there is a review without a title. Then we check if there exists a row w
     (user_id, title, rating_taken_from_user, review). In case there is a rating, then we update that row to include the
     review given to us as a parameter.
 '''
-def update_review(book_title, user_id, rating = None, review = None):
+def update_review(book_title: object, user_id: object, rating: object = None, review: object = None) -> object:
     if not utils.is_valid(book_title, user_id):
         raise DBException("Invalid book, user details.")
     elif rating is None and not is_user_exist( user_id ):

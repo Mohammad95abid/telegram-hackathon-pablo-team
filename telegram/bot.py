@@ -50,7 +50,7 @@ class Bot:
         pass
 
     @staticmethod
-    def set_action(user_id, action, text = None):
+    def set_action(user_id, action, text=None):
         action_dict = Bot.get_action_dict()
         action_dict[user_id] = dict()
         action_dict[user_id]["func"] = action
@@ -113,9 +113,8 @@ class Bot:
         pass
     #todo
     def unknown_commands_handler(self):
-        message = '''
-        Pablo couldnt understand your command. Use /menu to see a list of all commands.
-        '''
+        message = "Pablo couldnt understand your command.\n\n Use /menu to see a list of all commands."
+
         res = self.send_message_to_user(message)
         return
 
@@ -150,8 +149,9 @@ class Bot:
     def start_2_3(self, text):
         title = funcs.get_book_title_from(text)
         funcs.rate_book(self.user_id, title, True)
-        message = f"third book received\n" \
-            f"Your profile has been made. Feel free to enrich it by rating additional books using the command: /review_book"
+        message = f"third book received\n\n" \
+            f"Your profile has been made. Feel free to enrich it by rating additional books using the command:\n\n" \
+            f" /review_book"
         #TODO check if the command still the same
         Bot.set_action(self.user_id, None)
         res = self.send_message_to_user(message)
@@ -159,45 +159,44 @@ class Bot:
         return
 
     def review_book(self, text):
-        message = '''
-        Reviewing books updates your profile by learning which books you like and dislike.\n
-        Please enter the name of the book you'd like to rate
-        '''
+        message = "Reviewing books updates your profile by learning which books you like and dislike.\n\n" \
+                  "Please enter the name of the book you'd like to rate"
+
         Bot.set_action(self.user_id, self.review_book_1)
         res = self.send_message_to_user(message)
         return
 
     def review_book_1(self, text):
         title = funcs.get_book_title_from(text)
-        message ='''
-        Please rate the book by inserting:\n y for a positive rating \n n for a negative rating
-        '''
+        message = "Please rate the book by inserting:\n\n " \
+                  "y for a positive rating\n\n " \
+                  "n for a negative rating"
         Bot.set_action(self.user_id, self.review_book_2, title)
         res = self.send_message_to_user(message)
         return
 
     def review_book_2(self, text):
-        if text != 'y' and text !='n':
-            message = '''
-            Input invalid. Please rate the book by inserting:\n y for a positive rating \n n for a negative rating'''
+        if text != 'y' and text != 'n':
+            message = "Input invalid. Please rate the book by inserting:\n\n" \
+                      "y for a positive rating \n\nn for a negative rating"
+
             res = self.send_message_to_user(message)
             return
         rating = True if text == 'y' else False
         title = Bot.get_parameters(self.user_id)
         funcs.rate_book(self.user_id, title, rating)
         Bot.set_action(self.user_id, self.review_book_3, title)
-        message = '''
-        Your rating has been saved. Would you like to write a review?\n
-        Please insert:\n y to write a review. \n n to end the process of rating the book.
-        '''
+        message = "Your rating has been saved. Would you like to write a review?\n\n" \
+                  "Please insert:\n\n" \
+                  "y to write a review.\n\nn to end the process of rating the book."
         res = self.send_message_to_user(message)
         return
 
     def review_book_3(self, text):
-        if text != 'y' and text !='n':
-            message = '''
-            Input invalid. Please pick whether you'd like to review the book by inserting:\n
-             y to write a review. \n n to end the process of rating the book.'''
+        if text != 'y' and text != 'n':
+            message = "Input invalid. Please pick whether you'd like to review the book by inserting:\n\n" \
+                      "y to write a review. \n\nn to end the process of rating the book."
+
             res = self.send_message_to_user(message)
             return
         if text == 'n':
@@ -223,22 +222,19 @@ class Bot:
         pass
 
     def get_book_information(self, text):
-        message = '''
-                Please enter the title of the book about which you want Pablo to give you information
-                '''
+        message = "Please enter the title of the book about which you want Pablo to give you information"
         Bot.set_action(self.user_id, self.get_book_information_1)
         res = self.send_message_to_user(message)
         return
 
     def get_book_information_1(self, text):
-        message = '''
-        Please pick which command you want by inserting:\n
-        1 To read description of book\n
-        2 To get review of book\n
-        3 to get links to purchase\n
-        4 to get author of the book\n
-        5 to exit this command\n
-        '''
+        message = "Please pick which command you want by inserting:\n\n" \
+                  "1 To read description of book\n\n" \
+                  "2 To get review of book\n\n" \
+                  "3 to get links to purchase\n\n" \
+                  "4 to get author of the book\n\n" \
+                  "5 to exit this command"
+
         title = funcs.get_book_title_from(text)
         Bot.set_action(self.user_id, self.get_book_information_handler, title)
         res = self.send_message_to_user(message)
@@ -256,14 +252,14 @@ class Bot:
             return self.get_book_information_author(title)
         if text == '5':
             return self.get_book_information_exit(title)
-        message = '''
-        I didnt understand that command.\n please try again using one of the following commands:\n
-        1 To read description of book\n
-        2 To get review of book\n
-        3 to get links to purchase\n
-        4 to get author of the book\n
-        5 to exit this command\n
-        '''
+        message = "I didnt understand that command.\n\n" \
+                  "please try again using one of the following commands:\n\n" \
+                  "1 To read description of book\n\n" \
+                  "2 To get review of book\n\n " \
+                  "3 to get links to purchase\n\n " \
+                  "4 to get author of the book\n\n" \
+                  "5 to exit this command\n\n"
+
         res = self.send_message_to_user(message)
         return
 
@@ -276,12 +272,11 @@ class Bot:
         pass
     #TODO finish this func
     def get_book_information_review(self, title):
-        message = '''
-        Choose which kind of review you want by pressing:\n
-        1 To choose a general review\n
-        2 To choose a positive review\n
-        3 To choose a negative review\n
-        '''
+        message = "Choose which kind of review you want by pressing:\n\n" \
+                    "1 To choose a general review\n\n" \
+                    "2 To choose a positive review\n\n" \
+                    "3 To choose a negative review\n\n"
+
         res = self.send_message_to_user(message)
         Bot.set_action(self.user_id, self.get_book_information_review_handler, title)
         pass
@@ -294,12 +289,12 @@ class Bot:
             return self.get_book_information_review_pos(title)
         if text == '3':
             return self.get_book_information_review_neg(title)
-        message = '''
-                I didnt understand that command.\n please try again using one of the following commands:\n
-                1 To choose a general review\n
-                2 To choose a positive review\n
-                3 To choose a negative review\n
-                '''
+        message = "I didnt understand that command.\n\n " \
+                  "please try again using one of the following commands:\n\n " \
+                  "1 To choose a general review\n\n " \
+                  "2 To choose a positive review\n\n " \
+                  "3 To choose a negative review\n"
+
         res = self.send_message_to_user(message)
         return
 
@@ -347,13 +342,17 @@ class Bot:
 
     def get_book_information_purchase_link(self, title):
         link = funcs.get_buy_link(title)
+        if title.count(',') > 0:
+            title = title.replace(',', ')')
+            title = title[:title.index(')') + 1]
         if link is not None:
-            message = "You can buy:\n" + title + "\nby using this link:\n" + link
-            # message = f"You can use this link:\n{link}\nto buy:\n{title}\n\n"
+            # message = "You can buy:\n" + title + "\nby using this link:\n" + link
+            message = f"You can use this link:\n{link}\nto buy:\n{title}\n\n"
         else:
             message = f"We couldnt find a purchase link for {title}"
 
-        message = message.replace('#', '')
+        # message = message.replace(',', ')')
+        # message = message[:message.index(')') + 1]
         print(message)
         res = self.send_message_to_user(message)
         self.get_book_information_1(title)
@@ -380,13 +379,12 @@ class Bot:
 
 
     def get_recommendation(self, *args):
-        message = '''
-                Pablo can recommend you books based on you profile or based on a specific book.\n
-                So that Pablo can recommend you the book you want. Please insert\n:
-                1 To get a recommendation based on your profile\n
-                2 To get a recommendation similar to a specific book\n
-                3 To get a recommendation based on the author of a specific book\n
-                '''
+        message = "Pablo can recommend you books based on you profile or based on a specific book.\n\n" \
+                  "So that Pablo can recommend you the book you want. Please insert:\n\n" \
+                  "1 To get a recommendation based on your profile\n\n" \
+                  "2 To get a recommendation similar to a specific book\n\n" \
+                  "3 To get a recommendation based on the author of a specific book"
+
         Bot.set_action(self.user_id, self.get_recommendation_1)
         res = self.send_message_to_user(message)
         return
@@ -401,12 +399,11 @@ class Bot:
         if text == '3':
             return self.get_recommendation_similar_to_author(text)
             pass
-        message = '''
-        I didnt understand that command.\n please try again using one of the following commands:\n
-        1 To get a recommendation based on your profile\n
-        2 To get a recommendation similar to a specific book\n
-        3 To get a recommendation based on the author of a specific book\n
-        '''
+        message = "I didnt understand that command.\n\n" \
+                  "please try again using one of the following commands:\n\n" \
+                  "1 To get a recommendation based on your profile\n\n" \
+                  "2 To get a recommendation similar to a specific book\n\n" \
+                  "3 To get a recommendation based on the author of a specific book\n"
         res = self.send_message_to_user(message)
         return
 
@@ -440,35 +437,43 @@ class Bot:
     #TODO finish this func
     def get_recommendation_similar_to_author1(self, text):
         title = funcs.get_book_title_from(text)
-        message = 'this feature is still to be implemented'
+        all_author_books =  funcs.get_all_books_by_author(title)
+        sampling = random.choices(all_author_books, k=min(len(all_author_books), 3))
+        message = f"Here are {len(sampling)} books created by the same author:\n"
+        for i in range(1, len(sampling) + 1):
+            if sampling[i - 1].count(',') > 0:
+                sampling[i-1] = sampling[i-1].replace(',', ')')
+                sampling[i-1] = sampling[i-1][:sampling[i-1].index(')') + 1]
+            message += sampling[i - 1]
+            message += '\n'
+        print(message)
         res = self.send_message_to_user(message)
         Bot.set_action(self.user_id, None)
         self.check_if_exist_connection()
         pass
 
     def get_menu_of_bot(self, text):
-        message = '''
-        1)/start: welcomes back old users and create a new user for new users\n
-        2)/description: returns a description of the bot\n
-        3)/rate_book: given the name of a book and a rating, we will add that book to your profile\n
-        4)/get_recommendation: Presents you with 3 books that will be tailored to your taste\n
-        5)/get_library: Shows you the books you have enjoyed\n
-        6)/review_book: Given the name of a book, gives you the freedom to write a review of the book, whether you liked it or not\n
-        7)/get_review: Given the name of a book, returns a review of the book\n
-        8)/get_recommendation_by_genre: Given the name of a book, returns 3 books from the same genre\n
-        9)/get_recommendation_by_author: Given the name of a book, returns other books from the same author\n
-        10)/get_purchase_link: Given the name of a book, returns an online link to purchase it\n
-        11)/get_audio_link: Given the name of a book, returns a link for the audio book version of that book\n
-        12)/connect_to_user: Returns the first name and last name of 3 other people who share a similar taste to you\n
-        '''
+        message = "1)/start: welcomes back old users and create a new user for new users\n" \
+                  "2)/description: returns a description of the bot\n\n" \
+                  "3)/rate_book: given the name of a book and a rating, we will add that book to your profile\n\n" \
+                  "4)/get_recommendation: Presents you with 3 books that will be tailored to your taste\n\n" \
+                  "5)/get_library: Shows you the books you have enjoyed\n\n" \
+                  "6)/review_book: Given the name of a book, gives you the freedom to write a review of the book, whether you liked it or not\n\n" \
+                  "7)/get_review: Given the name of a book, returns a review of the book\n\n" \
+                  "8)/get_recommendation_by_genre: Given the name of a book, returns 3 books from the same genre\n\n" \
+                  "9)/get_recommendation_by_author: Given the name of a book, returns other books from the same author\n\n" \
+                  "10)/get_purchase_link: Given the name of a book, returns an online link to purchase it\n\n" \
+                  "11)/get_audio_link: Given the name of a book, returns a link for the audio book version of that book\n\n" \
+                  "12)/connect_to_user: Returns the first name and last name of 3 other people who share a similar taste to you\n\n"
+
         res = self.send_message_to_user(message)
         return
 
     def get_bot_description(self, text):
-        message = '''
-        This Bot is made to help Bookworms through their thrilling learning odyssey.Pablo is a personal assistant to 
-        bookworms who would like to get to know new books tailored to their taste.
-        '''#TODO complete the description
+        message = "This Bot is made to help Bookworms through their thrilling learning odyssey.\n\n" \
+                  "Pablo is a personal assistant to bookworms who would like to get to know new books" \
+                  " tailored to their taste."
+        #TODO complete the description
         res = self.send_message_to_user(message)
         return
 
@@ -513,10 +518,9 @@ class Bot:
         pass
 
     def connect_to_user(self, text):
-        message = '''
-        Pablo connects you with the users who have similar literary taste as you, provided that they accept your 
-        invitation. Please enter the amount of people you would like to connect to
-        '''
+        message = "Pablo connects you with the users who have similar literary taste as you," \
+                  " provided that they accept your invitation. " \
+                  "Please enter the amount of people you would like to connect to"
         res = self.send_message_to_user(message)
         Bot.set_action(self.user_id, self.connect_to_user1)
         pass
@@ -538,20 +542,17 @@ class Bot:
                 return
             if Bot.get_action(user_id) is None:
             # if Bot.action_dict[user_id] is None:
-                message = '''
-                A user with similar literary taste to yours would like to connect with you\n
-                Please insert:\ny to agree to connect\nn to deny the request
-                '''
+                message = "A user with similar literary taste to yours would like to connect with " \
+                          "you\n\nPlease insert:\n\ny to agree to connect\n\nn to deny the request"
                 Bot.set_action(user_id, other_bot.connect_to_user_recieve, self.user_id)
                 res = requests.get("https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}"
                                    .format(config.TOKEN, user_id, message))
 
             else:
                 Bot.connection_dict[user_id] = {"func" : other_bot.connect_to_user_recieve_late, "text" : self.user_id}
-        message = '''
-        Your connection request has been sent to the most suitable users. In case they would agree to 
-        connect with you, you would receive their username and password
-        '''
+        message = "Your connection request has been sent to the most suitable users.\n\n " \
+                  "In case they would agree to connect with you," \
+                  " you would receive their username and password"
         res = self.send_message_to_user(message)
 
 
@@ -577,8 +578,9 @@ class Bot:
         pass
 
     def connect_to_user_recieve_late(self, user_id):
-        message = '''A user with similar literary taste to yours would like to connect with you\n
-                Please insert:\ny to agree to connect\nn to deny the request'''
+        message = "A user with similar literary taste to yours would like to connect with you\nPlease insert:\n\n" \
+                  "y to agree to connect\n\nn to deny the request"
+
         Bot.set_action(self.user_id, self.connect_to_user_recieve, user_id)
         res = requests.get("https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}"
                            .format(config.TOKEN, self.user_id, message))
