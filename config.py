@@ -1,4 +1,5 @@
 
+
 import pymysql
 
 
@@ -24,4 +25,3 @@ connection = pymysql.connect(
     charset="utf8",
     cursorclass=pymysql.cursors.DictCursor
 )
-
