@@ -278,7 +278,13 @@ class Bot:
 
     def get_book_information_purchase_link(self, title):
         link = funcs.get_buy_link(title)
-        message = f"You can buy:\n{title}\nby using this link:\n{link}\n\n"
+        if link is not None:
+            message = "You can buy:\n" + title + "\nby using this link:\n" + link
+            # message = f"You can use this link:\n{link}\nto buy:\n{title}\n\n"
+        else:
+            message = f"We couldnt find a purchase link for {title}"
+
+        message = message.replace('#', '')
         print(message)
         res = self.send_message_to_user(message)
         self.get_book_information_1(title)
