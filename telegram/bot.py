@@ -6,7 +6,6 @@ from telegram.node import Node
 
 ''' 
 Commands:
-
 1)/start
 2)/description of bot
 3)/rate_book
@@ -267,6 +266,7 @@ class Bot:
         message = f"I hope you enjoy reading {title}"
         self.send_message_to_user(message)
         return
+
 
     def get_library(self, *args):
         pass
