@@ -10,6 +10,8 @@ def sanity():return "server running"
 
 @app.route('/message', methods=["POST"])
 def handle_message():
+    if request.get_json().get('message') is None:
+        return Response("success")
     bot = Bot(request)
     bot.function_handler()
     # print("got message")
@@ -23,5 +25,6 @@ def handle_message():
 
 
 if __name__ == '__main__':
-    app.run(port = 5002)
+    # requests.get(config.URL)
+    app.run(port=5002)
 
