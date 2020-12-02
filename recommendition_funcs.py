@@ -65,19 +65,19 @@ def rate_book(user_id,book_title,is_like,*args):
         create_user(user_id,first_name,last_name)
 
     if not is_book_exist(book_title):
-        description=get_description(book_title)
-        if description is None:
-            description = "No description found, This is a new book in the system!"
-        description=description[:400]
-        # description = list(description)
-        # if "'" in description:
-        #     description.remove("'")
-        # description=''.join(description)
-        description = escape_single_quote(description)
+        # description=get_description(book_title)
+        # if description is None:
+        #     description = "No description found, This is a new book in the system!"
+        # description=description[:400]
+        # # description = list(description)
+        # # if "'" in description:
+        # #     description.remove("'")
+        # # description=''.join(description)
+        # description = escape_single_quote(description)
 
-        add_book(book_title,description,None,None,"action")
+        add_book(book_title, None, None)
 
-    update_review(book_title,user_id,is_like)
+    update_review(book_title, user_id, is_like)
 
 
 
@@ -155,13 +155,14 @@ def get_book_author(book_title):
                 break
     return res
 
-def get_review_from_db(ratting = None):
-    if ratting is None:
-        return get_all_reviews()
-    elif ratting:
-        return get_all_positive_reviews()
-    else:
-        return get_all_negative_reviews()
+def get_review_from_db(book_title, ratting = None):
+    return get_all_review_by_book_title(book_title, ratting)
+    # if ratting is None:
+    #     return get_all_reviews()
+    # elif ratting:
+    #     return get_all_positive_reviews()
+    # else:
+    #     return get_all_negative_reviews()
 
 
 #print(get_recomndition_book("15egT4"))
