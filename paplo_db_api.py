@@ -258,6 +258,17 @@ def get_all_negative_reviews():
             review['like_'] = False
         return res
 
+def convert_bit_to_bool(data):
+    for review in data:
+        if int.from_bytes(review['like_'], byteorder='big', signed=True) == 1:
+            review['like_'] = True
+        else:
+            review['like_'] = False
+    return data
+
+def convert_bool_to_ratting(bool_):
+    return 1 if bool_ else 0
+
 def get_all_reviews():
     with connection.cursor() as cursor:
         query = "SELECT * FROM reviews;"
@@ -269,4 +280,46 @@ def get_all_reviews():
             else:
                 review['like_'] = False
         return res
+
+def get_all_review_by_book_title(book_title, ratting = None):
+    with connection.cursor() as cursor:
+        condition = "book_title like '{}' and like_ = '{}'".format(book_title, convert_bool_to_ratting(ratting))
+        if ratting is None:
+            condition = "book_title like '{}'".format(book_title)
+        query = "SELECT * FROM reviews WHERE {};".format(condition)
+        cursor.execute(query)
+        res = cursor.fetchall()
+        return convert_bit_to_bool(res)
+
+def get_all_users_love_book(book_title):
+    data = get_all_review_by_book_title('Book21', True)
+    users_by_id = [user['user_id'] for user in data]
+    return list(set(users_by_id))
+
+def get_all_pos_ratting_books_by_user(user_id):
+    with connection.cursor() as cursor:
+        condition = "user_id like '{}' and like_ = '1'".format(user_id)
+        query = "SELECT * FROM reviews WHERE {};".format(condition)
+        cursor.execute(query)
+        res = cursor.fetchall()
+        return list(set([review['book_title'] for review in res]))
+
+def git_all_pos_rating_books_of_users(users_id):
+    res = []
+    for user_id in users_id:
+        for book in get_all_pos_ratting_books_by_user(user_id):
+            res.append(book)
+    return list(set(res))
+
+def get_recommendations_books(user_id, book_title):
+    with connection.cursor() as cursor:
+        condition = "user_id like '{}' ".format(user_id)
+        query = "SELECT * FROM reviews WHERE {};".format(condition)
+        cursor.execute(query)
+        res = cursor.fetchall()
+        user_reviews = list(set([review['book_title'] for review in res]))
+        books_to_reco = git_all_pos_rating_books_of_users(get_all_users_love_book(book_title))
+        res = [ book for book in books_to_reco if book not in user_reviews ]
+        return res
+
 
