@@ -270,7 +270,7 @@ def convert_bit_to_bool(data):
 def convert_bool_to_ratting(bool_):
     return 1 if bool_ else 0
 
-def get_all_reviews():
+def get_all_reviews(book_title):
     with connection.cursor() as cursor:
         query = "SELECT * FROM reviews;"
         cursor.execute(query)
@@ -285,9 +285,10 @@ def get_all_reviews():
 def get_all_review_by_book_title(book_title, ratting = None):
     book_title = escape_single_quote(book_title)
     with connection.cursor() as cursor:
-        condition = "book_title like '{}' and like_ = '{}'".format(book_title, convert_bool_to_ratting(ratting))
         if ratting is None:
             condition = "book_title like '{}'".format(book_title)
+        else:
+            condition = "book_title like '{}' and like_ = '{}'".format(book_title, convert_bool_to_ratting(ratting))
         query = "SELECT * FROM reviews WHERE {};".format(condition)
         cursor.execute(query)
         res = cursor.fetchall()
@@ -325,5 +326,3 @@ def get_recommendations_books(user_id, book_title):
         books_to_reco = git_all_pos_rating_books_of_users(get_all_users_love_book(book_title))
         res = [ book for book in books_to_reco if book not in user_reviews ]
         return res
-
-
