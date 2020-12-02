@@ -140,6 +140,16 @@ def get_recomndition_book(user_id):
 def review_book(user_id, book_title, review):
     return update_review(book_title, user_id, None, review)
 
+def get_book_author(book_title):
+    book_id = get_book_id(book_title)
+    client = gr.Client(developer_key='<q5QJR1BpwdBHs7SLjH0mw>')
+    book = client.Book.show(book_id)
+    authors = book['authors']['author']
+    res = []
+    for elem in authors:
+        if elem:
+            res.append( escape_single_quote( elem['name'] ) )
+    return res
 
 #print(get_recomndition_book("15egT4"))
 #rate_book("123","My Book2",False,"serigio","ramos")
