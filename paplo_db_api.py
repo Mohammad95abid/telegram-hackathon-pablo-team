@@ -240,3 +240,35 @@ def is_user_like_a_book(book_title, user_id):
         res = cursor.fetchone()
         return int.from_bytes(res['like_'], byteorder='big', signed=True) == 1
     return False
+
+def get_all_positive_reviews():
+    with connection.cursor() as cursor:
+        condition  = "WHERE like_ = '1' "
+        query = "SELECT * FROM reviews {}".format(condition)
+        cursor.execute(query)
+        res = cursor.fetchall()
+        for review in res:
+            review['like_'] = True
+        return res
+
+def get_all_negative_reviews():
+    with connection.cursor() as cursor:
+        condition  = "WHERE like_ = '0' "
+        query = "SELECT * FROM reviews {}".format(condition)
+        cursor.execute(query)
+        res = cursor.fetchall()
+        for review in res:
+            review['like_'] = False
+        return res
+
+def get_all_reviews():
+    with connection.cursor() as cursor:
+        query = "SELECT * FROM reviews;"
+        cursor.execute(query)
+        res = cursor.fetchall()
+        for review in res:
+            if int.from_bytes(review['like_'], byteorder='big', signed=True) == 1:
+                review['like_'] = True
+            else:
+                review['like_'] = False
+        return res
