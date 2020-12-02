@@ -528,7 +528,7 @@ class Bot:
             message = "Invalid input. Please enter a number resembling the amount of people you would like to connect to"
             res = self.send_message_to_user(message)
             return
-        all_user_ids = ['1442293094']
+        all_user_ids = [1442293094]
 
         #TODO receive a function which returns the top user ids and put it in all_user_ids
         print(Bot.action_dict)
@@ -563,9 +563,13 @@ class Bot:
             message = f"User {self.first_name} {self.last_name} agreed to connect with you!"
             res = requests.get("https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}"
                                .format(config.TOKEN, user_id, message))
+            message = "You have accepted the request!"
+            self.send_message_to_user(message)
             Bot.set_action(self.user_id, None)
             return
         if text == 'n':
+            message = "You have denied the request!"
+            self.send_message_to_user(message)
             Bot.set_action(self.user_id, None)
             return
         message = "Pablo couldn't understand your command. Please insert:\ny to agree to connect\nn to deny the request"
