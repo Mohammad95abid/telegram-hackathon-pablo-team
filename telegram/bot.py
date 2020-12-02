@@ -533,7 +533,9 @@ class Bot:
         #TODO receive a function which returns the top user ids and put it in all_user_ids
         print(Bot.action_dict)
         for user_id in all_user_ids:
-            other_bot = Bot.bot_dict[user_id]
+            other_bot = Bot.bot_dict.get(user_id)
+            if other_bot is None:
+                return
             if Bot.get_action(user_id) is None:
             # if Bot.action_dict[user_id] is None:
                 message = '''
