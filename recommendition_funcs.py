@@ -28,7 +28,7 @@ def get_book_id(book_title):
 
 def get_book_genre(book_id):
     client = gr.Client(developer_key='<q5QJR1BpwdBHs7SLjH0mw>')
-    book = client.Book.show('1128430')
+    book = client.Book.show(book_id)
     x = book['popular_shelves']
     res = set()
     for elem in x['shelf']:
@@ -41,7 +41,8 @@ def get_book_url_from_GR(book_title):
     book = client.Book.show(book_id)
     return book['link']
 
-def get_buy_link(book_id):
+def get_buy_link(book_title):
+    book_id = get_book_id(book_title)
     client = gr.Client(developer_key='<q5QJR1BpwdBHs7SLjH0mw>')
     book = client.Book.show(book_id)
     isbn = book['isbn']
