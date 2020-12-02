@@ -2,6 +2,7 @@ from flask import request
 import recommendition_funcs as funcs
 import config
 import requests
+from telegram.node import Node
 
 ''' 
 Commands:
@@ -22,6 +23,8 @@ Commands:
 
 
 class Bot:
+
+
     actionDict = dict()
     @staticmethod
     def fill_empty_action_dict(empty_dict):

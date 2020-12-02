@@ -1,6 +1,6 @@
 from flask import Flask, request, Response
 import requests
-# import config
+import config
 from telegram.bot import Bot
 
 app = Flask(__name__)
@@ -23,6 +23,6 @@ def handle_message():
 
 
 if __name__ == '__main__':
-
+    requests.get(config.URL)
     app.run(port=5002)
 
