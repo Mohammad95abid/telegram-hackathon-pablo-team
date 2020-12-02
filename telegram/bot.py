@@ -81,17 +81,8 @@ class Bot:
         self.__handler["/review_book"] = self.review_book
         self.__handler["/menu"] = self.get_menu_of_bot
         self.__handler["/get_recommendation"] = self.get_recommendation
-        self.__handler["/get_library"] = self.get_library
         self.__handler["/connect_to_user"] = self.connect_to_user
-        # self.__handler["/rate_book"] = self.rate_book
-        # self.__handler["/get_review"] = self.get_review
-        # self.__handler["/get_recommendation_by_genre"] = self.get_recommendation_by_genre
-        # self.__handler["/get_recommendation_by_author"] = self.get_recommendation_by_author
-        # self.__handler["/get_purchase_link"] = self.get_purchase_link
-        # self.__handler["/get_audio_link"] = self.get_audio_link
 
-    def check_uncompleted_actions(self):
-        pass
 
     def function_handler(self):
         full_request = self.my_request.get_json()["message"]["text"]
@@ -484,16 +475,11 @@ class Bot:
     def get_menu_of_bot(self, text):
         message = "1)/start: welcomes back old users and create a new user for new users\n" \
                   "2)/description: returns a description of the bot\n\n" \
-                  "3)/rate_book: given the name of a book and a rating, we will add that book to your profile\n\n" \
-                  "4)/get_recommendation: Presents you with 3 books that will be tailored to your taste\n\n" \
-                  "5)/get_library: Shows you the books you have enjoyed\n\n" \
-                  "6)/review_book: Given the name of a book, gives you the freedom to write a review of the book, whether you liked it or not\n\n" \
-                  "7)/get_review: Given the name of a book, returns a review of the book\n\n" \
-                  "8)/get_recommendation_by_genre: Given the name of a book, returns 3 books from the same genre\n\n" \
-                  "9)/get_recommendation_by_author: Given the name of a book, returns other books from the same author\n\n" \
-                  "10)/get_purchase_link: Given the name of a book, returns an online link to purchase it\n\n" \
-                  "11)/get_audio_link: Given the name of a book, returns a link for the audio book version of that book\n\n" \
-                  "12)/connect_to_user: Returns the first name and last name of 3 other people who share a similar taste to you\n\n"
+                  "3)/get_recommendation: Presents you with 3 books that will be tailored to your taste\n\n" \
+                  "4)/get_book_information: Presents you a command menu where you can enquire data of a certain book" \
+                  "5)/review_book: Given the name of a book, gives you the freedom to write a review of the book, whether you liked it or not\n\n" \
+                  "6)/connect_to_user: Returns the first name and last name of 3 other people who share a similar taste to you\n\n" \
+                  "7)/menu: Shows you all the possible commands"
 
         res = self.send_message_to_user(message)
         return
@@ -561,11 +547,11 @@ class Bot:
             message = "Invalid input. Please enter a number resembling the amount of people you would like to connect to"
             res = self.send_message_to_user(message)
             return
-        all_user_ids = [1442293094]
-
-        #TODO receive a function which returns the top user ids and put it in all_user_ids
+        all_user_ids = funcs.get_similar_users(self.user_id, num_of_people)
+        # all_user_ids = [1442293094]
         print(Bot.action_dict)
         for user_id in all_user_ids:
+            user_id = int(user_id)
             other_bot = Bot.bot_dict.get(user_id)
             if other_bot is None:
                 return
