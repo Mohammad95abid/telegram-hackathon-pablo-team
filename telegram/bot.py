@@ -283,6 +283,7 @@ class Bot:
 
     def get_book_information_review_handler(self, text):
         title = Bot.get_parameters(self.user_id)
+        print(title)
         if text == '1':
             return self.get_book_information_review_rand(title)
         if text == '2':
@@ -300,9 +301,11 @@ class Bot:
 
     def get_book_information_review_pos(self, title):
         message = "here are your reviews:\n"
-        review_list = [elem['review'] for elem in funcs.get_review_from_db(True) if elem['book_title'] == title]
+        review_list = [elem['review'] for elem in funcs.get_review_from_db(title, True)]
         review_list = list(set(review_list))
-        sampling = random.choices(review_list, k=min(len(review_list), 3))
+        sampling = list(set(random.choices(review_list, k=min(len(review_list), 3))))
+        while len(sampling) != min(len(review_list), 3):
+            sampling = list(set(random.choices(review_list, k=min(len(review_list), 3))))
         sampling = [elem for elem in sampling if elem is not None]
         if not sampling:
             message = "There are no positive reviews for this book"
@@ -314,9 +317,11 @@ class Bot:
 
     def get_book_information_review_neg(self, title):
         message = "here are your reviews:\n"
-        review_list = [elem['review'] for elem in funcs.get_review_from_db(False) if elem['book_title'] == title]
+        review_list = [elem['review'] for elem in funcs.get_review_from_db(title, False)]
         review_list = list(set(review_list))
-        sampling = random.choices(review_list, k=min(len(review_list), 3))
+        sampling = list(set(random.choices(review_list, k=min(len(review_list), 3))))
+        while len(sampling) != min(len(review_list), 3):
+            sampling = list(set(random.choices(review_list, k=min(len(review_list), 3))))
         sampling = [elem for elem in sampling if elem is not None]
         if not sampling:
             message = "There are no negative reviews for this book"
@@ -328,9 +333,11 @@ class Bot:
 
     def get_book_information_review_rand(self, title):
         message = "here are your reviews:\n"
-        review_list = [elem['review'] for elem in funcs.get_review_from_db() if elem['book_title'] == title]
+        review_list = [elem['review'] for elem in funcs.get_review_from_db(title)]
         review_list = list(set(review_list))
-        sampling = random.choices(review_list, k=min(len(review_list), 3))
+        sampling = list(set(random.choices(review_list, k=min(len(review_list), 3))))
+        while len(sampling) != min(len(review_list), 3):
+            sampling = list(set(random.choices(review_list, k=min(len(review_list), 3))))
         sampling = [elem for elem in sampling if elem is not None]
         if not sampling:
             message = "There are no reviews for this book"
@@ -410,6 +417,9 @@ class Bot:
     def get_recommendation_personal(self, text):
         title = funcs.get_recomndition_book(self.user_id)
         message = f"We hope you will enjoy reading\n{title}"
+        if message.count(',') > 0:
+            message = message[:message.index(',') + 1]
+            message = message.replace(',', ')')
         res = self.send_message_to_user(message)
         Bot.set_action(self.user_id, None)
         self.check_if_exist_connection()
@@ -429,8 +439,13 @@ class Bot:
     #TODO finish this func
     def get_recommendation_similar_to_book1(self, text):
         title = funcs.get_book_title_from(text)
-        all_books = funcs.get_all_recomndition_book(self.user_id, title)
-        sampling = random.choices(all_books, k=min(len(all_books), 3))
+        all_books = list(set(funcs.get_all_recomndition_book(self.user_id, title)))
+        if title.count(',') > 0:
+            title = title.replace(',', ')')
+            title = title[:title.index(')') + 1]
+        sampling = list(set(random.choices(all_books, k=min(len(all_books), 3))))
+        while len(sampling) != min(len(all_books), 3):
+            sampling = list(set(random.choices(all_books, k=min(len(all_books), 3))))
         message = f"Here are {len(sampling)} books similar to {title}:\n"
         for i in range(1, len(sampling) + 1):
             if sampling[i - 1].count(',') > 0:
@@ -446,8 +461,13 @@ class Bot:
     #TODO finish this func
     def get_recommendation_similar_to_author1(self, text):
         title = funcs.get_book_title_from(text)
-        all_author_books =  funcs.get_all_books_by_author(title)
-        sampling = random.choices(all_author_books, k=min(len(all_author_books), 3))
+        all_author_books =  list(set(funcs.get_all_books_by_author(title)))
+        if title.count(',') > 0:
+            title = title.replace(',', ')')
+            title = title[:title.index(')') + 1]
+        sampling = list(set(random.choices(all_author_books, k=min(len(all_author_books), 3))))
+        while len(sampling) != min(len(all_author_books), 3):
+            sampling = list(set(random.choices(all_author_books, k=min(len(all_author_books), 3))))
         message = f"Here are {len(sampling)} books created by the same author:\n"
         for i in range(1, len(sampling) + 1):
             if sampling[i - 1].count(',') > 0:

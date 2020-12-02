@@ -5,10 +5,6 @@ from  paplo_db_api import  is_user_exist as exist
 import goodreads_api_client as gr
 import collections
 
-
-def escape_single_quote(text):
-    return text.replace("'","`")
-
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
   cleantext = re.sub(cleanr, '', raw_html)
@@ -159,13 +155,14 @@ def get_book_author(book_title):
                 break
     return res
 
-def get_review_from_db(ratting = None):
-    if ratting is None:
-        return get_all_reviews()
-    elif ratting:
-        return get_all_positive_reviews()
-    else:
-        return get_all_negative_reviews()
+def get_review_from_db(book_title, ratting = None):
+    return get_all_review_by_book_title(book_title, ratting)
+    # if ratting is None:
+    #     return get_all_reviews()
+    # elif ratting:
+    #     return get_all_positive_reviews()
+    # else:
+    #     return get_all_negative_reviews()
 
 
 #print(get_recomndition_book("15egT4"))
@@ -229,4 +226,5 @@ def get_all_books_by_author(book_title):
     return list(set(res))
 
 def get_all_recomndition_book(user_id, book_title):
+    book_title = escape_single_quote(book_title)
     return get_recommendations_books(user_id, book_title)
