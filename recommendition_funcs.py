@@ -67,17 +67,17 @@ def rate_book(user_id,book_title,is_like,*args):
         create_user(user_id,first_name,last_name)
 
     if not is_book_exist(book_title):
-        description=get_description(book_title)
-        if description is None:
-            description = "No description found, This is a new book in the system!"
-        description=description[:400]
-        # description = list(description)
-        # if "'" in description:
-        #     description.remove("'")
-        # description=''.join(description)
-        description = escape_single_quote(description)
+        # description=get_description(book_title)
+        # if description is None:
+        #     description = "No description found, This is a new book in the system!"
+        # description=description[:400]
+        # # description = list(description)
+        # # if "'" in description:
+        # #     description.remove("'")
+        # # description=''.join(description)
+        # description = escape_single_quote(description)
 
-        add_book(book_title,description,None,None,"action")
+        add_book(book_title," wow",None,None,"action")
 
     update_review(book_title,user_id,is_like)
 

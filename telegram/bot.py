@@ -2,6 +2,7 @@ from flask import request
 import recommendition_funcs as funcs
 import config
 import requests
+import random
 from telegram.node import Node
 
 ''' 
@@ -211,6 +212,7 @@ class Bot:
 
     def review_book_4(self, text):
         title = Bot.get_parameters(self.user_id)
+        print(title)
         funcs.review_book(self.user_id, title, text)
         message = 'Your review has been added'
         Bot.set_action(self.user_id, None)
@@ -271,10 +273,74 @@ class Bot:
         pass
     #TODO finish this func
     def get_book_information_review(self, title):
-        message = 'This feature is still under development'
+        message = '''
+        Choose which kind of review you want by pressing:\n
+        1 To choose a general review\n
+        2 To choose a positive review\n
+        3 To choose a negative review\n
+        '''
         res = self.send_message_to_user(message)
-        self.get_book_information_1(title)
+        Bot.set_action(self.user_id, self.get_book_information_review_handler, title)
         pass
+
+    def get_book_information_review_handler(self, text):
+        title = Bot.get_parameters(self.user_id)
+        if text == '1':
+            return self.get_book_information_review_rand(title)
+        if text == '2':
+            return self.get_book_information_review_pos(title)
+        if text == '3':
+            return self.get_book_information_review_neg(title)
+        message = '''
+                I didnt understand that command.\n please try again using one of the following commands:\n
+                1 To choose a general review\n
+                2 To choose a positive review\n
+                3 To choose a negative review\n
+                '''
+        res = self.send_message_to_user(message)
+        return
+
+    def get_book_information_review_pos(self, title):
+        message = "here are your reviews:\n"
+        review_list = [elem['review'] for elem in funcs.get_review_from_db(True) if elem['book_title'] == title]
+        review_list = list(set(review_list))
+        sampling = random.choices(review_list, k=min(len(review_list), 3))
+        sampling = [elem for elem in sampling if elem is not None]
+        if not sampling:
+            message = "There are no positive reviews for this book"
+        else:
+            for i in range(1, 1 + min(len(sampling), 3)):
+                message += f"{i}) {sampling[i - 1]}\n"
+        res = self.send_message_to_user(message)
+        return self.get_book_information_1(title)
+
+    def get_book_information_review_neg(self, title):
+        message = "here are your reviews:\n"
+        review_list = [elem['review'] for elem in funcs.get_review_from_db(False) if elem['book_title'] == title]
+        review_list = list(set(review_list))
+        sampling = random.choices(review_list, k=min(len(review_list), 3))
+        sampling = [elem for elem in sampling if elem is not None]
+        if not sampling:
+            message = "There are no negative reviews for this book"
+        else:
+            for i in range(1, 1 + min(len(sampling), 3)):
+                message += f"{i}) {sampling[i - 1]}\n"
+        res = self.send_message_to_user(message)
+        return self.get_book_information_1(title)
+
+    def get_book_information_review_rand(self, title):
+        message = "here are your reviews:\n"
+        review_list = [elem['review'] for elem in funcs.get_review_from_db() if elem['book_title'] == title]
+        review_list = list(set(review_list))
+        sampling = random.choices(review_list, k=min(len(review_list), 3))
+        sampling = [elem for elem in sampling if elem is not None]
+        if not sampling:
+            message = "There are no reviews for this book"
+        else:
+            for i in range(1, 1 + min(len(sampling), 3)):
+                message += f"{i}) {sampling[i - 1]}\n"
+        res = self.send_message_to_user(message)
+        return self.get_book_information_1(title)
 
     def get_book_information_purchase_link(self, title):
         link = funcs.get_buy_link(title)
