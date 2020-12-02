@@ -55,6 +55,17 @@ def get_book_title_from( book_title ):
     book = client.Book.show(book_id)
     return book['title']
 
+def get_book_author(book_title):
+    book_id = get_book_id(book_title)
+    client = gr.Client(developer_key='<q5QJR1BpwdBHs7SLjH0mw>')
+    book = client.Book.show(book_id)
+    authors = book['authors']['author']
+    res = []
+    for elem in authors:
+        if elem:
+            res.append( escape_single_quote( elem['name'] ) )
+    return res
+
 def rate_book(user_id,book_title,is_like,*args):
     if not exist(user_id):
         first_name=args[0]
