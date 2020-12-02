@@ -20,6 +20,41 @@ def get_description(book_title):
     book = client.Book.title(book_title)
     return book['description']
 
+def get_book_id(book_title):
+    client = gr.Client(developer_key='<q5QJR1BpwdBHs7SLjH0mw>')
+    book = client.Book.title(book_title)
+    return book['id']
+
+def get_book_genre(book_id):
+    client = gr.Client(developer_key='<q5QJR1BpwdBHs7SLjH0mw>')
+    book = client.Book.show('1128430')
+    x = book['popular_shelves']
+    res = set()
+    for elem in x['shelf']:
+        res.add(elem['@name'])
+    return res
+
+def get_book_url_from_GR(book_title):
+    book_id = get_book_id(book_title)
+    client = gr.Client(developer_key='<q5QJR1BpwdBHs7SLjH0mw>')
+    book = client.Book.show(book_id)
+    return book['link']
+
+def get_buy_link(book_id):
+    client = gr.Client(developer_key='<q5QJR1BpwdBHs7SLjH0mw>')
+    book = client.Book.show(book_id)
+    isbn = book['isbn']
+    if isbn is None:
+        return None
+    amz = "http://www.amazon.com/dp/{}".format(isbn)
+    return amz
+
+def get_book_title_from( book_title ):
+    book_id = get_book_id(book_title)
+    client = gr.Client(developer_key='<q5QJR1BpwdBHs7SLjH0mw>')
+    book = client.Book.show(book_id)
+    return book['title']
+
 def rate_book(user_id,book_title,is_like,*args):
     if not exist(user_id):
         first_name=args[0]
@@ -77,7 +112,6 @@ def get_recomndition_book(user_id):
         if user['user_id'] == user_id:
             continue
         cur_user_reviews = get_review_by_user_id(user['user_id'])
-        print("user id = {}, other user = {}, reviews = {}".format(user_id, user['user_id'], cur_user_reviews))
         for review in cur_user_reviews:
             cur_review = get_review_by_booktitle(user_reviews, review['book_title'])
             if cur_review == None:
@@ -100,10 +134,8 @@ def get_recomndition_book(user_id):
             max=similarity
             max_similarty_user=user['user_id']
             new_book_to_recommend = book_to_recommend
-    print("new_book_to_recommend list: ", new_book_to_recommend)
     if len(new_book_to_recommend) > 0:
         return random.choice(new_book_to_recommend)
-    print("Book Is Empty")
 
 def get_book_description(book_title):
         pass
