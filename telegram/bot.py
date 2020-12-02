@@ -283,9 +283,15 @@ class Bot:
         res = self.send_message_to_user(message)
         self.get_book_information_1(title)
         pass
-    #TODO finish this func
+    #TODO finish this func by fixing bug
     def get_book_information_author(self, title):
-        message = 'This feature is still under development'
+        authors = funcs.get_book_author(title)
+        s = '' if len(authors) == 1 else 's'
+        is_are = 'is' if len(authors) == 1 else 'are'
+        message = f'The author{s} of this book {is_are}:\n'
+        for author in authors:
+            message += author
+            message += '\n'
         res = self.send_message_to_user(message)
         self.get_book_information_1(title)
         pass
