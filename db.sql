@@ -6,6 +6,7 @@ CREATE TABLE Users(
     last_name VARCHAR(50)
 );
 
+
 CREATE TABLE Books(
     title VARCHAR(100) NOT NULL PRIMARY KEY,
     link_to_buy VARCHAR(100),
