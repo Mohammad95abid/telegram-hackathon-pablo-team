@@ -429,8 +429,16 @@ class Bot:
     #TODO finish this func
     def get_recommendation_similar_to_book1(self, text):
         title = funcs.get_book_title_from(text)
-
-        message = 'this feature is still to be implemented'
+        all_books = funcs.get_all_recomndition_book(self.user_id, title)
+        sampling = random.choices(all_books, k=min(len(all_books), 3))
+        message = f"Here are {len(sampling)} books similar to {title}:\n"
+        for i in range(1, len(sampling) + 1):
+            if sampling[i - 1].count(',') > 0:
+                sampling[i - 1] = sampling[i - 1].replace(',', ')')
+                sampling[i - 1] = sampling[i - 1][:sampling[i - 1].index(')') + 1]
+            message += sampling[i - 1]
+            message += '\n'
+        print(message)
         res = self.send_message_to_user(message)
         Bot.set_action(self.user_id, None)
         self.check_if_exist_connection()
