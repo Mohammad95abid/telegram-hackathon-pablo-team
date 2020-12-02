@@ -228,3 +228,5 @@ def get_all_books_by_author(book_title):
             res.append(elem)
     return list(set(res))
 
+def get_all_recomndition_book(user_id, book_title):
+    return get_recommendations_books(user_id, book_title)
