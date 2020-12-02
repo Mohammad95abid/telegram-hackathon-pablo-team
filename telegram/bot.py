@@ -49,12 +49,23 @@ class Bot:
         action_dict = Bot.get_action_dict()
         if action_dict.get(user_id, None) is None:
             action_dict[user_id] = None
-        return action_dict[user_id]
+        try:
+            return action_dict[user_id]["func"]
+        except:
+            return None
 
     @staticmethod
-    def set_action(user_id, action):
+    def get_parameters(user_id):
         action_dict = Bot.get_action_dict()
-        action_dict[user_id] = action
+        return action_dict[user_id]["text"]
+        pass
+
+    @staticmethod
+    def set_action(user_id, action, text = None):
+        action_dict = Bot.get_action_dict()
+        action_dict[user_id] = dict()
+        action_dict[user_id]["func"] = action
+        action_dict[user_id]["text"] = text
 
     def __init__(self, myrequest):
         self.first_name = None
@@ -75,6 +86,7 @@ class Bot:
     def create_handler_of_bot(self):
         self.__handler["/start"] = self.start
         self.__handler["/description"] = self.get_bot_description
+        self.__handler["/get_book_information"] = self.get_book_information
         self.__handler["/menu"] = self.get_menu_of_bot
         self.__handler["/rate_book"] = self.rate_book
         self.__handler["/get_recommendation"] = self.get_recommendation
@@ -142,10 +154,68 @@ class Bot:
         res = self.send_message_to_user(message)
         return
 
+    def review_book(self, text):
+        message = '''
+        Reviewing books updates your profile by learning which books you like and dislike.\n
+        Please enter the name of the book you'd like to rate
+        '''
+        Bot.set_action(self.user_id, self.review_book_1)
+        res = self.send_message_to_user(message)
+        return
 
-    def review_book(self, *args):
+    def review_book_1(self, text):
+        message ='''
+        Please rate the book by inserting:\n y for a positive rating \n n for a negative rating
+        '''
+        Bot.set_action(self.user_id, self.review_book_2, text)
+        res = self.send_message_to_user(message)
+        return
+
+    def review_book_2(self, text):
+        if text != 'y' and text !='n':
+            message = '''
+            Input invalid. Please rate the book by inserting:\n y for a positive rating \n n for a negative rating'''
+            res = self.send_message_to_user(message)
+            return
+        rating = True if text == 'y' else False
+        title = Bot.get_parameters(self.user_id)
+        funcs.rate_book(self.user_id, title, rating)
+        Bot.set_action(self.user_id, self.review_book_3, title)
+        message = '''
+        Your rating has been saved. Would you like to write a review?\n
+        Please insert:\n y to write a review. \n n to end the process of rating the book.
+        '''
+        res = self.send_message_to_user(message)
+        return
+
+    def review_book_3(self, text):
+        if text != 'y' and text !='n':
+            message = '''
+            Input invalid. Please pick whether you'd like to review the book by inserting:\n
+             y to write a review. \n n to end the process of rating the book.'''
+            res = self.send_message_to_user(message)
+            return
+        if text == 'n':
+            message = 'Book has been rated'
+            Bot.set_action(self.user_id, None)
+            res = self.send_message_to_user(message)
+            return
+        title = Bot.get_parameters(self.user_id)
+        Bot.set_action(self.user_id, self.review_book_4, title)
+        message = 'Please write down you review'
+        res = self.send_message_to_user(message)
+        return
+
+    def review_book_4(self, text):
+        title = Bot.get_parameters(self.user_id)
+        funcs.review_book(self.user_id, title, text)
+        message = 'Your review has been added'
+        Bot.set_action(self.user_id, None)
+        res = self.send_message_to_user(message)
         pass
 
+    def get_book_information(self, text):
+        pass
 
 
     def get_menu_of_bot(self, text):
@@ -193,7 +263,7 @@ class Bot:
 
 
     def get_recommendation(self, *args):
-        title = funcs.get_book(self.user_id)
+        title = funcs.get_recomndition_book(self.user_id)
         message = f"I hope you enjoy reading {title}"
         self.send_message_to_user(message)
         return
