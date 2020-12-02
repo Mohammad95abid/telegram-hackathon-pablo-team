@@ -86,17 +86,17 @@ class Bot:
         self.__handler["/start"] = self.start
         self.__handler["/description"] = self.get_bot_description
         self.__handler["/get_book_information"] = self.get_book_information
+        self.__handler["/review_book"] = self.review_book
         self.__handler["/menu"] = self.get_menu_of_bot
-        self.__handler["/rate_book"] = self.rate_book
         self.__handler["/get_recommendation"] = self.get_recommendation
         self.__handler["/get_library"] = self.get_library
-        self.__handler["/review_book"] = self.review_book
-        self.__handler["/get_review"] = self.get_review
-        self.__handler["/get_recommendation_by_genre"] = self.get_recommendation_by_genre
-        self.__handler["/get_recommendation_by_author"] = self.get_recommendation_by_author
-        self.__handler["/get_purchase_link"] = self.get_purchase_link
-        self.__handler["/get_audio_link"] = self.get_audio_link
         self.__handler["/connect_to_user"] = self.connect_to_user
+        # self.__handler["/rate_book"] = self.rate_book
+        # self.__handler["/get_review"] = self.get_review
+        # self.__handler["/get_recommendation_by_genre"] = self.get_recommendation_by_genre
+        # self.__handler["/get_recommendation_by_author"] = self.get_recommendation_by_author
+        # self.__handler["/get_purchase_link"] = self.get_purchase_link
+        # self.__handler["/get_audio_link"] = self.get_audio_link
 
     def check_uncompleted_actions(self):
         pass
@@ -302,6 +302,71 @@ class Bot:
         res = self.send_message_to_user(message)
         pass
 
+
+    def get_recommendation(self, *args):
+        message = '''
+                Pablo can recommend you books based on you profile or based on a specific book.\n
+                So that Pablo can recommend you the book you want. Please insert\n:
+                1 To get a recommendation based on your profile\n
+                2 To get a recommendation similar to a specific book\n
+                3 To get a recommendation based on the author of a specific book\n
+                '''
+        Bot.set_action(self.user_id, self.get_recommendation_1)
+        res = self.send_message_to_user(message)
+        return
+
+    def get_recommendation_1(self, text):
+        if text == '1':
+            return self.get_recommendation_personal(text)
+            pass
+        if text == '2':
+            return self.get_recommendation_similar_to_book(text)
+            pass
+        if text == '3':
+            return self.get_recommendation_similar_to_author(text)
+            pass
+        message = '''
+        I didnt understand that command.\n please try again using one of the following commands:\n
+        1 To get a recommendation based on your profile\n
+        2 To get a recommendation similar to a specific book\n
+        3 To get a recommendation based on the author of a specific book\n
+        '''
+        res = self.send_message_to_user(message)
+        return
+
+    def get_recommendation_personal(self, text):
+        title = funcs.get_recomndition_book(self.user_id)
+        message = f"We hope you will enjoy reading\n{title}"
+        res = self.send_message_to_user(message)
+        Bot.set_action(self.user_id, None)
+
+    def get_recommendation_similar_to_book(self, text):
+        message = "Please enter the name of the book"
+        res = self.send_message_to_user(message)
+        Bot.set_action(self.user_id, self.get_recommendation_similar_to_book1)
+        pass
+
+    def get_recommendation_similar_to_author(self, text):
+        message = "Please enter the name of the book"
+        res = self.send_message_to_user(message)
+        Bot.set_action(self.user_id, self.get_recommendation_similar_to_author1)
+        pass
+
+    #TODO finish this func
+    def get_recommendation_similar_to_book1(self, text):
+        title = funcs.get_book_title_from(text)
+        message = 'this feature is still to be implemented'
+        res = self.send_message_to_user(message)
+        Bot.set_action(self.user_id, None)
+        pass
+    #TODO finish this func
+    def get_recommendation_similar_to_author1(self, text):
+        title = funcs.get_book_title_from(text)
+        message = 'this feature is still to be implemented'
+        res = self.send_message_to_user(message)
+        Bot.set_action(self.user_id, None)
+        pass
+
     def get_menu_of_bot(self, text):
         message = '''
         1)/start: welcomes back old users and create a new user for new users\n
@@ -346,11 +411,6 @@ class Bot:
 
 
 
-    def get_recommendation(self, *args):
-        title = funcs.get_recomndition_book(self.user_id)
-        message = f"I hope you enjoy reading {title}"
-        self.send_message_to_user(message)
-        return
 
 
     def get_library(self, *args):
