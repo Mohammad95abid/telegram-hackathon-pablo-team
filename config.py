@@ -1,6 +1,7 @@
 
+
 import pymysql
-import requests
+
 
 API_KEYS = {
     "key": "q5QJR1BpwdBHs7SLjH0mw",
@@ -8,10 +9,8 @@ API_KEYS = {
 }
 
 
-# NGROK = 'https://0f9b99641393.ngrok.io/message'
-NGROK = 'https://32e05d3752f6.ngrok.io/message'
-# TOKEN = '1447831093:AAH1c0VxTtok89zxlMuxQR9oPvCmiriZq_4'
-TOKEN = '1418798786:AAHZKbNqK1G2tokOT_aIfhuNuQW1ZCRsaGU'
+NGROK = 'https://0f9b99641393.ngrok.io/message'
+TOKEN = '1447831093:AAH1c0VxTtok89zxlMuxQR9oPvCmiriZq_4'
 TELEGRAM_HOST = 'https://api.telegram.org/bot'
 SET_WEBHOOK = '/setWebhook?url='
 
@@ -21,11 +20,8 @@ URL = TELEGRAM_HOST + TOKEN + SET_WEBHOOK + NGROK
 connection = pymysql.connect(
     host="localhost",
     user="root",
-    password="root",
+    password="umrulz",
     db="paplo",
     charset="utf8",
     cursorclass=pymysql.cursors.DictCursor
 )
-
-if __name__ == '__main__':
-    requests.get(URL)
