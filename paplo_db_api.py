@@ -3,6 +3,9 @@ import db_api_utils as utils
 from paplo_exceptions import DBException
 
 
+def escape_single_quote(text):
+    return text.replace("'","`")
+
 def create_user(user_id, user_first_name, user_last_name):
     if not utils.is_valid(user_id, user_first_name, user_last_name):
         raise DBException("Invalid user details.")
@@ -23,6 +26,7 @@ def create_user(user_id, user_first_name, user_last_name):
 Checks if book exists, and if it doesnt, it inserts it into the Books table
 '''
 def add_book(book_title, book_purchase_link, book_audio_link):
+    book_title = escape_single_quote(book_title)
     if not utils.is_valid(book_title):
         raise DBException("Invalid book details.")
     try:
@@ -45,21 +49,8 @@ def add_book(book_title, book_purchase_link, book_audio_link):
         raise DBException(message)
     return False
 
-"""
-def get_recommendation(user_id):
-    pass
-
-
-def get_recommendation_genre(user_id, book_title):
-    pass
-
-
-def get_recommendation_author(user_id, book_title):
-    pass
-
-"""
-
 def is_book_review_exist(book_title, user_id):
+    book_title = escape_single_quote(book_title)
     with connection.cursor() as cursor:
         condition = "user_id like '{}' and book_title like '{}' ".format(user_id, book_title)
         query = "SELECT * FROM reviews WHERE {}".format(condition)
@@ -75,6 +66,7 @@ def is_user_exist(user_id):
         return len( cursor.fetchall() ) > 0
 
 def add_book_rating(book_title, user_id, rating: bool):
+    book_title = escape_single_quote(book_title)
     try:
         with connection.cursor() as cursor:
             # there are two cases, add new review when no instance of both book_title, user_id in the table
@@ -98,6 +90,7 @@ def add_book_rating(book_title, user_id, rating: bool):
 
 
 def add_book_review(book_title, user_id, review):
+    book_title = escape_single_quote(book_title)
     try:
         with connection.cursor() as cursor:
             condition = "user_id = '{}' and book_title = '{}'".format(user_id, book_title)
@@ -111,6 +104,7 @@ def add_book_review(book_title, user_id, review):
     return False
 
 def add_book_rating_review(book_title, user_id, rating = None, review = None):
+    book_title = escape_single_quote(book_title)
     try:
         with connection.cursor() as cursor:
             like_  = 1 if rating else 0
@@ -137,6 +131,7 @@ In case there is a review without a title. Then we check if there exists a row w
     review given to us as a parameter.
 '''
 def update_review(book_title, user_id, rating = None, review = None):
+    book_title = escape_single_quote(book_title)
     if not utils.is_valid(book_title, user_id):
         raise DBException("Invalid book, user details.")
     elif rating is None and not is_user_exist( user_id ):
@@ -154,6 +149,7 @@ def update_review(book_title, user_id, rating = None, review = None):
 
 
 def get_review_with_specific_rating(book_title, user_id, rating:bool):
+    book_title = escape_single_quote(book_title)
     with connection.cursor() as cursor:
         rating = 1 if rating else 0
         condition = "user_id like '{}' and book_title like '{}' and like_ = b'{}'"\
@@ -164,6 +160,7 @@ def get_review_with_specific_rating(book_title, user_id, rating:bool):
 
 
 def get_review_without_rating(book_title, user_id):
+    book_title = escape_single_quote(book_title)
     with connection.cursor() as cursor:
         query = "SELECT * FROM reviews WHERE user_id like '{}' and book_title like '{}'" \
             .format(user_id, book_title)
@@ -172,6 +169,7 @@ def get_review_without_rating(book_title, user_id):
 
 
 def get_review(book_title, user_id, rating: bool = None):
+    book_title = escape_single_quote(book_title)
     if not utils.is_valid(book_title, user_id):
         raise DBException("Invalid book, user details.")
     if rating is None:
@@ -210,6 +208,7 @@ def show_table(table_name):
         print(result)
 
 def is_book_exist(book_title):
+    book_title = escape_single_quote(book_title)
     if not utils.is_valid(book_title):
         raise DBException("Invalid book title details.")
     with connection.cursor() as cursor:
@@ -219,6 +218,7 @@ def is_book_exist(book_title):
         return len(cursor.fetchall()) > 0
 
 def get_book(book_title):
+    book_title = escape_single_quote(book_title)
     if not utils.is_valid(book_title):
         raise DBException("Invalid book title details.")
     with connection.cursor() as cursor:
@@ -228,6 +228,7 @@ def get_book(book_title):
         return cursor.fetchone()
 
 def is_user_like_a_book(book_title, user_id):
+    book_title = escape_single_quote(book_title)
     if not utils.is_valid(user_id):
         raise DBException("Invalid user details.")
     with connection.cursor() as cursor:
@@ -282,6 +283,7 @@ def get_all_reviews():
         return res
 
 def get_all_review_by_book_title(book_title, ratting = None):
+    book_title = escape_single_quote(book_title)
     with connection.cursor() as cursor:
         condition = "book_title like '{}' and like_ = '{}'".format(book_title, convert_bool_to_ratting(ratting))
         if ratting is None:
@@ -292,7 +294,8 @@ def get_all_review_by_book_title(book_title, ratting = None):
         return convert_bit_to_bool(res)
 
 def get_all_users_love_book(book_title):
-    data = get_all_review_by_book_title('Book21', True)
+    book_title = escape_single_quote(book_title)
+    data = get_all_review_by_book_title(book_title, True)
     users_by_id = [user['user_id'] for user in data]
     return list(set(users_by_id))
 
@@ -312,6 +315,7 @@ def git_all_pos_rating_books_of_users(users_id):
     return list(set(res))
 
 def get_recommendations_books(user_id, book_title):
+    book_title = escape_single_quote(book_title)
     with connection.cursor() as cursor:
         condition = "user_id like '{}' ".format(user_id)
         query = "SELECT * FROM reviews WHERE {};".format(condition)
