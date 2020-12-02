@@ -192,13 +192,9 @@ class Bot:
 
 
     def get_recommendation(self, *args):
-        print("----------------------------Start Reco-----------------------------")
         title = funcs.get_recomndition_book(self.user_id)
-        print("title", title)
         message = f"I hope you enjoy reading {title}"
-        print("message", message)
         self.send_message_to_user(message)
-        print("----------------------------END Reco-----------------------------")
         return
 
 
