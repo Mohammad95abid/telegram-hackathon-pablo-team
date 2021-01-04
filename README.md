@@ -8,3 +8,5 @@ The bot give the readers variety of options:
 3. Getting information of a book like full title or description according to similar search text.  
 
 The project work on Telegram Bot Technology using Python and Python-Flask Server, In addition to integration with Good-Reads API.
+
+<a href="https://imgbb.com/"><img src="https://i.ibb.co/QFvXxdz/Paplo.gif" alt="Paplo" border="0"></a>
